@@ -1,0 +1,58 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "prizm-echarts-components": {
+      "projectType": "library",
+      "root": "projects/prizm-echarts-components",
+      "sourceRoot": "projects/prizm-echarts-components/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:ng-packagr",
+          "options": {
+            "project": "projects/prizm-echarts-components/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/prizm-echarts-components/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/prizm-echarts-components/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "tsConfig": "projects/prizm-echarts-components/tsconfig.spec.json",
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ]
+          }
+        },
+        "storybook": {
+          "builder": "@storybook/angular:start-storybook",
+          "options": {
+            "configDir": "projects/prizm-echarts-components/.storybook",
+            "browserTarget": "prizm-echarts-components:build",
+            "compodoc": false,
+            "port": 6006
+          }
+        },
+        "build-storybook": {
+          "builder": "@storybook/angular:build-storybook",
+          "options": {
+            "configDir": "projects/prizm-echarts-components/.storybook",
+            "browserTarget": "prizm-echarts-components:build",
+            "compodoc": false,
+            "outputDir": "storybook-static"
+          }
+        }
+      }
+    }
+  }
+}
