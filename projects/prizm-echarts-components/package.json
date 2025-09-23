@@ -6,6 +6,7 @@
     "@angular/core": "^18.2.0"
   },
   "dependencies": {
+    "ngx-echarts": "^18.0.0",
     "tslib": "^2.3.0"
   },
   "sideEffects": false

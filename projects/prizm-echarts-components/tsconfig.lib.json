@@ -7,9 +7,10 @@
     "declaration": true,
     "declarationMap": true,
     "inlineSources": true,
-    "types": []
+    "types": [],
+    "paths": {
+      "@angular/*": ["./node_modules/@angular/*"]
+    }
   },
-  "exclude": [
-    "**/*.spec.ts"
-  ]
+  "exclude": ["**/*.spec.ts"]
 }
