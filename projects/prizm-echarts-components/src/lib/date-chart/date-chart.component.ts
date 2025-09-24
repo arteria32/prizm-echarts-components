@@ -1,38 +1,43 @@
 import { Component } from '@angular/core';
-import { EChartsCoreOption } from 'echarts/core';
 // import echarts core
 import * as echarts from 'echarts/core';
 // import necessary echarts components
-import { LineChart } from 'echarts/charts';
-import { GridComponent } from 'echarts/components';
-import { CanvasRenderer } from 'echarts/renderers';
 import { CommonModule } from '@angular/common';
-echarts.use([LineChart, GridComponent, CanvasRenderer]);
+import { EChartsOption } from 'echarts';
+import { LineChart } from 'echarts/charts';
+import { DataZoomSliderComponent, GridComponent } from 'echarts/components';
+import { CanvasRenderer } from 'echarts/renderers';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
-
+import { ECHARTS_CONFIG_PRESETS } from './constants';
+echarts.use([LineChart, GridComponent,DataZoomSliderComponent, CanvasRenderer]);
 
 @Component({
-  standalone:true,
-    providers: [provideEchartsCore({ echarts })],
+  standalone: true,
+  providers: [provideEchartsCore({ echarts })],
   imports: [CommonModule, NgxEchartsDirective],
   selector: 'prizm-date-chart',
   templateUrl: './date-chart.component.html',
-  styleUrl: './date-chart.component.scss'
+  styleUrl: './date-chart.component.scss',
 })
 export class PrizmDateChartComponent {
-protected chartOption: EChartsCoreOption = {
-  xAxis: {
-    type: 'category',
-    data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-  },
-  yAxis: {
-    type: 'value',
-  },
-  series: [
-    {
-      data: [820, 932, 901, 934, 1290, 1330, 1320],
-      type: 'line',
+  protected chartOption: EChartsOption = {
+    yAxis: {
+      type: 'value',
     },
-  ],
-};
+       xAxis: ECHARTS_CONFIG_PRESETS.X_AXIS,
+
+    series: [
+      {
+        data: [
+          ['2024-04-09T00:00:00Z', 2],
+          ['2025-04-09T00:00:00Z', 3],
+          ['2026-04-09T00:00:00Z', 2],
+          ['2027-04-09T00:00:00Z', 2],
+          ['2028-04-09T00:00:00Z', 2],
+        ] as const,
+        type: 'line',
+      },
+    ],
+    dataZoom: ECHARTS_CONFIG_PRESETS.SCROLL_SLIDER,
+  };
 }
