@@ -13,8 +13,9 @@ export default meta;
 type Story = StoryObj<PrizmDateChartComponent>;
 
 export const Default: Story = {
-render:()=>({
-    template:'<prizm-date-chart/>'
-})
+  render: () => ({
+    template:`<div [style]="{width: '1200px', height: '600px',background:'antiquewhite'}">
+              <prizm-date-chart/>
+              </div>`
+  }),
 };
-
