@@ -14,7 +14,7 @@ type Story = StoryObj<PrizmDateChartComponent>;
 
 export const Default: Story = {
   render: () => ({
-    template:`<div [style]="{width: '1200px', height: '600px',background:'antiquewhite'}">
+    template:`<div [style]="{width: '800px', height: '500px',background:'antiquewhite'}">
               <prizm-date-chart/>
               </div>`
   }),
