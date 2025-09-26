@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 // import echarts core
 import * as echarts from 'echarts/core';
 // import necessary echarts components
@@ -31,6 +31,10 @@ echarts.use([
   styleUrl: './date-chart.component.scss',
 })
 export class PrizmDateChartComponent {
+
+    @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+
+    
   private chartInstance: null | echarts.ECharts = null;
   protected onChartInit(instance: echarts.ECharts) {
     this.chartInstance = instance;
@@ -54,6 +58,32 @@ export class PrizmDateChartComponent {
     URL.revokeObjectURL(url);
   }
 
+    private readFileAsText(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        resolve(e.target?.result as string);
+      };
+      reader.onerror = reject;
+      reader.readAsText(file);
+    });
+  }
+
+  protected async importFile(e:Event){
+    const target = e.target as HTMLInputElement;
+      const [configFile] = target.files as FileList;
+      if(!configFile){
+        console.warn('Empty file')
+      }
+
+    console.log("importFile",configFile);
+    try {
+      const config=await this.readFileAsText(configFile).then((res)=>JSON.parse(res))
+      this.chartInstance?.setOption(config) 
+    } catch (error) {
+      console.warn("invalid file",error)
+    }
+  }
   protected chartOption: EChartsOption = {
     yAxis: {
       type: 'value',
@@ -61,14 +91,18 @@ export class PrizmDateChartComponent {
     xAxis: ECHARTS_CONFIG_PRESETS.X_AXIS,
     toolbox: {
       feature: {
-        saveAsImage: {
-          title: 'Export PNG',
-          pixelRatio: 2,
-        },
         myExportConfig: {
           icon: ICONS_PATHS.EXPORT_FILE,
+          title:"Export Chart Settings",
           onclick: () => {
             this.exportConfig();
+          },
+        },
+          myImportConfig: {
+          icon: ICONS_PATHS.IMPORT_FILE,
+          title:"Import Chart Settings",
+          onclick: () => {
+            this.fileInputRef.nativeElement.click();
           },
         },
       },
