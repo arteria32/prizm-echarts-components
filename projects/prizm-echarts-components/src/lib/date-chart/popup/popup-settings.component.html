@@ -1,12 +1,36 @@
 <ng-template #dialogContent>
   <div class="popup-body">
-    test
+    <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
+      <div formGroupName="series" class="series-container">
+        <div *ngFor="let series of seriesSettings$ | async; let i = index" class="series-item">
+          <label [for]="'series-name-' + i">Series {{ i + 1 }} Name:</label>
+          <div [formGroupName]="i" class="series-fields">
+            <input
+              type="text"
+              id="series-name-{{ i }}"
+              formControlName="name"
+              class="series-name-input"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" prizmButton appearance="primary" size="xl">Save</button>
+      </div>
+    </form>
   </div>
 </ng-template>
 
 <ng-template #footerTemp let-completeWith="completeWith">
   <div class="box">
-    <button (click)="completeWith(null)" prizmButton appearance="primary" size="xl">Закрыть</button>
+    <button
+      (click)="completeWith(null)"
+      prizmButton
+      appearance="primary"
+      size="xl"
+    >
+      Закрыть
+    </button>
     <button (click)="completeWith()" prizmButton appearance="primary" size="xl">
       Сохранить
     </button>
