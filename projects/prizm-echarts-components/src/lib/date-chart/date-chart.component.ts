@@ -28,7 +28,7 @@ import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import { ECHARTS_CONFIG_PRESETS, ICONS_PATHS } from './constants';
 import { PopupSettingsComponent } from './popup/popup-settings.component';
 import { createDatasetSources, createSeriesOptions } from './utils';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 
 echarts.use([
   LineChart,
@@ -65,7 +65,7 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
   @ViewChild(PopupSettingsComponent) popupComponent!: PopupSettingsComponent;
   private chartInstance: null | echarts.ECharts = null;
-
+  protected mergeOptions$ = new Subject<EChartsOption>();
   private cdr = inject(ChangeDetectorRef);
 
   protected isSettingsVisible$ = new BehaviorSubject(false);
@@ -81,7 +81,7 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
       return;
     }
     const currentState = this.chartInstance.getOption() as EChartsOption;
-    this.isSettingsVisible$.next(!this.isSettingsVisible$.value);
+    this.isSettingsVisible$.next(true);
 
     this.seriesSettings$.next(
       Array.isArray(currentState.series) ? currentState.series : null
@@ -185,7 +185,6 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
     }
   }
   onChangeSeries(newInputSeries: PrizmEchartSeries[]) {
-    console.log('onChangeSeries', newInputSeries);
     if (!this.chartInstance) {
       console.warn("chart isn't initialized");
       return;
@@ -203,11 +202,14 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
         : ([currentState.series].filter(Boolean) as SeriesOption[])
     );
 
-    const resultSeries = {
-      ...this.chartInstance.getOption(),
-      dataset,
+    this.mergeOptions$.next({ dataset, series });
+  }
+  onChangesSubmit(series: SeriesOption[]) {
+    this.pushOptionChanges({
       series,
-    };
-    this.chartInstance.setOption(resultSeries);
+    });
+  }
+  private pushOptionChanges(newState: EChartsOption) {
+    this.mergeOptions$.next(newState);
   }
 }

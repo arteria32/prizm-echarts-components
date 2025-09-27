@@ -1,6 +1,6 @@
 <ng-template #dialogContent>
   <div class="popup-body">
-    <form [formGroup]="formGroup" (ngSubmit)="onSubmit()">
+    <form [formGroup]="formGroup">
       <div formGroupName="series" class="series-container">
         <div *ngFor="let series of seriesSettings$ | async; let i = index" class="series-item">
           <label [for]="'series-name-' + i">Series {{ i + 1 }} Name:</label>
@@ -13,9 +13,6 @@
             />
           </div>
         </div>
-      </div>
-      <div class="form-actions">
-        <button type="submit" prizmButton appearance="primary" size="xl">Save</button>
       </div>
     </form>
   </div>
@@ -31,7 +28,7 @@
     >
       Закрыть
     </button>
-    <button (click)="completeWith()" prizmButton appearance="primary" size="xl">
+    <button (click)="completeWith(formGroup)" prizmButton appearance="primary" size="xl">
       Сохранить
     </button>
   </div>

@@ -1,12 +1,14 @@
 <div
   echarts
   [options]="chartOption"
+  [merge]="mergeOptions$ | async"
   class="prizm-date-chart"
   (chartInit)="onChartInit($event)"
 ></div>
 <prizm-popup-settings
-  [isVisible]="isSettingsVisible$ |async"
+  [isVisible]="isSettingsVisible$ | async"
   [seriesSettings]="seriesSettings$ | async"
+  (onChangesSubmit)="onChangesSubmit($event)"
 />
 <input
   type="file"

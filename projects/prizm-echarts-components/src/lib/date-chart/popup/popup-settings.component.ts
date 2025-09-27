@@ -2,10 +2,12 @@ import { CommonModule } from '@angular/common';
 import {
   Component,
   DestroyRef,
+  EventEmitter,
   inject,
   Input,
   OnChanges,
   OnInit,
+  Output,
   TemplateRef,
   ViewChild,
 } from '@angular/core';
@@ -40,33 +42,35 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
 
   @Input() isVisible: boolean | null = false;
   seriesSettings$ = new BehaviorSubject<SeriesOption[]>([]);
-  @Input() set seriesSettings(value: SeriesOption[]) {
-    this.seriesSettings$.next(value);
+  @Input() set seriesSettings(value: SeriesOption[] | null) {
+    if (value) {
+      this.seriesSettings$.next(value);
+    }
   }
 
-  @Input() onCloseCallback: (() => void) | null = null;
+  @Output() onChangesSubmit=new EventEmitter<SeriesOption[]>()
 
   private readonly destroyRef$ = inject(DestroyRef);
   private readonly dialogService = inject(PrizmDialogService);
   private readonly formBuilder = inject(FormBuilder);
   formGroup: FormGroup = this.formBuilder.group({});
 
-  onSubmit(): void {
-    if (this.formGroup.valid) {
-      const seriesFormArray = this.formGroup.get('series');
-      const seriesValues = seriesFormArray?.value || [];
-      
-      const currentSeries = this.seriesSettings$.value;
-      const updatedSeries = currentSeries.map((series, index) => {
-        return {
-          ...series,
-          name: seriesValues[index]?.name || series.name
-        };
-      });
-      
-      this.seriesSettings$.next(updatedSeries);
-      console.log('Series settings updated:', updatedSeries);
+  onSubmit(newStateFormGroup: FormGroup): void {
+    if (!newStateFormGroup.valid) {
+      console.warn('INVALID FORM');
+      return;
     }
+    const seriesFormArray = newStateFormGroup.get('series');
+    const seriesValues = seriesFormArray?.value || [];
+
+    const currentSeries = this.seriesSettings$.value;
+    const updatedSeries = currentSeries.map((series, index) => {
+      return {
+        ...series,
+        name: seriesValues[index]?.name || series.name,
+      };
+    });
+    this.onChangesSubmit.emit(updatedSeries);
   }
 
   ngOnInit() {
@@ -89,7 +93,6 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
         this.formGroup = this.formBuilder.group({
           series: seriesGroup,
         });
-        console.log('formGroup', this.formGroup, value);
       });
   }
 
@@ -110,7 +113,11 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
         backdrop: false,
       })
       .pipe(takeUntilDestroyed(this.destroyRef$))
-      .subscribe();
+      .subscribe((res) => {
+        if (res) {
+          this.onSubmit(res as FormGroup);
+        }
+      });
   }
 
   show(): void {
@@ -118,10 +125,8 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
   }
 
   onClose() {
-    if (this.onCloseCallback) {
-      this.onCloseCallback();
-    } else {
+   
       this.isVisible = false;
-    }
+    
   }
 }
