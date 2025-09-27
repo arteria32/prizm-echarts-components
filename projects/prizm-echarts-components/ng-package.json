@@ -3,5 +3,9 @@
   "dest": "../../dist/prizm-echarts-components",
   "lib": {
     "entryFile": "src/public-api.ts"
-  }
+  },
+  "styles": [
+    "node_modules/@prizm-ui/theme/src/styles/styles.less",
+    "node_modules/@prizm-ui/components/src/styles/styles.less"
+  ]
 }

@@ -6,6 +6,10 @@
     "@angular/core": "^18.2.0"
   },
   "dependencies": {
+    "@angular/animations": "^18.2.14",
+    "@prizm-ui/components": "^5.9.0",
+    "@prizm-ui/core": "^5.9.0",
+    "@prizm-ui/theme": "^5.9.0",
     "ngx-echarts": "^18.0.0",
     "tslib": "^2.3.0"
   },

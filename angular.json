@@ -28,10 +28,7 @@
           "builder": "@angular-devkit/build-angular:karma",
           "options": {
             "tsConfig": "projects/prizm-echarts-components/tsconfig.spec.json",
-            "polyfills": [
-              "zone.js",
-              "zone.js/testing"
-            ]
+            "polyfills": ["zone.js", "zone.js/testing"]
           }
         },
         "storybook": {
@@ -41,7 +38,11 @@
             "browserTarget": "prizm-echarts-components:build",
             "compodoc": false,
             "port": 6006,
-            "preserveSymlinks":true,
+            "preserveSymlinks": true,
+            "styles": [
+              "node_modules/@prizm-ui/theme/src/styles/styles.less",
+              "node_modules/@prizm-ui/components/src/styles/styles.less"
+            ]
           }
         },
         "build-storybook": {

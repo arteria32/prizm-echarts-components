@@ -1,13 +1,14 @@
-{{ isVisible}}
-
-<div class="popup-overlay" *ngIf="isVisible" (click)="onClose()">
-  <div class="popup-content" (click)="$event.stopPropagation()">
-    <div class="popup-header">
-      <h3>Details</h3>
-      <button class="close-button" (click)="onClose()">×</button>
-    </div>
-    <div class="popup-body">
-      <!-- Empty popup content - can be filled later -->
-    </div>
+<ng-template #dialogContent>
+  <div class="popup-body">
+    test
   </div>
-</div>
+</ng-template>
+
+<ng-template #footerTemp let-completeWith="completeWith">
+  <div class="box">
+    <button (click)="completeWith(null)" prizmButton appearance="primary" size="xl">Закрыть</button>
+    <button (click)="completeWith()" prizmButton appearance="primary" size="xl">
+      Сохранить
+    </button>
+  </div>
+</ng-template>
