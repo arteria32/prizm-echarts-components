@@ -15,6 +15,7 @@ import { EChartsOption, SeriesOption } from 'echarts';
 import { LineChart } from 'echarts/charts';
 import {
   DataZoomSliderComponent,
+  DataZoomInsideComponent,
   GridComponent,
   ToolboxComponent,
   DatasetComponent,
@@ -31,6 +32,7 @@ echarts.use([
   CanvasRenderer,
   ToolboxComponent,
   DatasetComponent,
+  DataZoomInsideComponent,
 ]);
 
 type DateString = string;
@@ -135,7 +137,7 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
       },
     },
     series: [],
-    dataZoom: ECHARTS_CONFIG_PRESETS.SCROLL_SLIDER,
+    dataZoom: ECHARTS_CONFIG_PRESETS.DATA_ZOOM,
   };
 
   ngOnChanges(changes: SimpleChanges): void {
