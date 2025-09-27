@@ -7,6 +7,11 @@ export const ECHARTS_CONFIG_PRESETS = {
       type: 'time' as const,
     },
   ],
+    Y_AXIS: [
+    {
+      type: 'value' as const,
+    },
+  ],
 };
 
 export const ICONS_PATHS = {
