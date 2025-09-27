@@ -1,0 +1,13 @@
+{{ isVisible}}
+
+<div class="popup-overlay" *ngIf="isVisible" (click)="onClose()">
+  <div class="popup-content" (click)="$event.stopPropagation()">
+    <div class="popup-header">
+      <h3>Details</h3>
+      <button class="close-button" (click)="onClose()">×</button>
+    </div>
+    <div class="popup-body">
+      <!-- Empty popup content - can be filled later -->
+    </div>
+  </div>
+</div>

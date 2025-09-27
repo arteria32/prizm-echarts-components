@@ -1,2 +1,17 @@
-<div echarts [options]="chartOption" class="prizm-date-chart"  (chartInit)="onChartInit($event)"></div>
-  <input type="file" #fileInput style="display: none;" (change)="importFile($event)" accept=".json">
+<div
+  echarts
+  [options]="chartOption"
+  class="prizm-date-chart"
+  (chartInit)="onChartInit($event)"
+></div>
+<prizm-popup-settings
+  [isVisible]="isSettingsVisible$ |async"
+  [seriesSettings]="seriesSettings$ | async"
+/>
+<input
+  type="file"
+  #fileInput
+  style="display: none"
+  (change)="importFile($event)"
+  accept=".json"
+/>

@@ -1,6 +1,8 @@
 import {
+  ChangeDetectorRef,
   Component,
   ElementRef,
+  inject,
   Input,
   OnChanges,
   OnInit,
@@ -14,16 +16,19 @@ import { CommonModule } from '@angular/common';
 import { EChartsOption, SeriesOption } from 'echarts';
 import { LineChart } from 'echarts/charts';
 import {
-  DataZoomSliderComponent,
+  DatasetComponent,
   DataZoomInsideComponent,
+  DataZoomSliderComponent,
   GridComponent,
   ToolboxComponent,
-  DatasetComponent,
+  TooltipComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import { ECHARTS_CONFIG_PRESETS, ICONS_PATHS } from './constants';
+import { PopupSettingsComponent } from './popup/popup-settings.component';
 import { createDatasetSources, createSeriesOptions } from './utils';
+import { BehaviorSubject, Observable } from 'rxjs';
 
 echarts.use([
   LineChart,
@@ -33,6 +38,7 @@ echarts.use([
   ToolboxComponent,
   DatasetComponent,
   DataZoomInsideComponent,
+  TooltipComponent,
 ]);
 
 type DateString = string;
@@ -48,7 +54,7 @@ export type PrizmEchartSeries = {
 @Component({
   standalone: true,
   providers: [provideEchartsCore({ echarts })],
-  imports: [CommonModule, NgxEchartsDirective],
+  imports: [CommonModule, NgxEchartsDirective, PopupSettingsComponent],
   selector: 'prizm-date-chart',
   templateUrl: './date-chart.component.html',
   styleUrl: './date-chart.component.scss',
@@ -57,7 +63,32 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
   @Input() series: PrizmEchartSeries[] = [];
 
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
+  @ViewChild(PopupSettingsComponent) popupComponent!: PopupSettingsComponent;
   private chartInstance: null | echarts.ECharts = null;
+
+  private cdr = inject(ChangeDetectorRef);
+
+  protected isSettingsVisible$ = new BehaviorSubject(false);
+
+  protected seriesSettings$ = new BehaviorSubject<SeriesOption[] | null>(null);
+  ngOnInit() {
+    this.onChangeSeries(this.series);
+  }
+
+  protected showPopup() {
+    if (!this.chartInstance) {
+      console.warn("chart isn't initialized");
+      return;
+    }
+    const currentState = this.chartInstance.getOption() as EChartsOption;
+    this.isSettingsVisible$.next(!this.isSettingsVisible$.value);
+
+    this.seriesSettings$.next(
+      Array.isArray(currentState.series) ? currentState.series : null
+    );
+    this.cdr.detectChanges();
+  }
+
   protected onChartInit(instance: echarts.ECharts) {
     console.log('onChartInit', instance);
     this.chartInstance = instance;
@@ -118,8 +149,16 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
     legend: {
       show: true,
     },
+
     toolbox: {
       feature: {
+        mySettingsPopup: {
+          icon: ICONS_PATHS.SETTINGS,
+          title: 'Settings',
+          onclick: () => {
+            this.showPopup();
+          },
+        },
         myExportConfig: {
           icon: ICONS_PATHS.EXPORT_FILE,
           title: 'Export Chart Settings',
@@ -144,9 +183,6 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
     if (changes['series']) {
       this.onChangeSeries(changes['series'].currentValue);
     }
-  }
-  ngOnInit() {
-    this.onChangeSeries(this.series);
   }
   onChangeSeries(newInputSeries: PrizmEchartSeries[]) {
     console.log('onChangeSeries', newInputSeries);
