@@ -55,15 +55,35 @@ export function createDatasetSources(
  * Creates SeriesOption array from PrizmEchartSeries array
  */
 export function createSeriesOptions(
-  series: PrizmEchartSeries[]
+  series: PrizmEchartSeries[],
+  oldSeriesSettings: SeriesOption[] = []
 ): SeriesOption[] {
-  return series.map((s) => ({
-    type: 'line',
-    name: s.name,
-    datasetId: s.name,
-    encode: {
-      x: 'd',
-      y: 'v',
-    },
-  }));
+  return series.map((s) => {
+    // Find existing settings for this series by name
+    const existingSettings = oldSeriesSettings.find(
+      (setting) => setting.name === s.name
+    );
+
+    // If existing settings found, use them, ensuring required properties are set
+    if (existingSettings) {
+      // Create a new object with the existing settings as the base
+      return {
+        ...existingSettings,
+        type: existingSettings.type || 'line', // Ensure type is set
+        name: s.name, // Ensure name matches the series name
+      } as SeriesOption;
+    }
+
+    // Default settings for new series
+    return {
+      type: 'line',
+      name: s.name,
+      datasetId: s.name,
+      encode: {
+        x: 'd',
+        y: 'v',
+      },
+    } as SeriesOption;
+  });
 }
+

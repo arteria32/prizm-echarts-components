@@ -113,6 +113,9 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
   protected chartOption: EChartsOption = {
     yAxis: ECHARTS_CONFIG_PRESETS.Y_AXIS,
     xAxis: ECHARTS_CONFIG_PRESETS.X_AXIS,
+    legend: {
+      show: true,
+    },
     toolbox: {
       feature: {
         myExportConfig: {
@@ -149,12 +152,18 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
       console.warn("chart isn't initialized");
       return;
     }
+    const currentState = this.chartInstance.getOption() as EChartsOption;
 
     // Create dataset from series data
     const dataset = createDatasetSources(newInputSeries);
 
     // Create or update series configurations
-    const series: SeriesOption[] = createSeriesOptions(newInputSeries);
+    const series: SeriesOption[] = createSeriesOptions(
+      newInputSeries,
+      Array.isArray(currentState.series)
+        ? currentState.series
+        : ([currentState.series].filter(Boolean) as SeriesOption[])
+    );
 
     const resultSeries = {
       ...this.chartInstance.getOption(),
