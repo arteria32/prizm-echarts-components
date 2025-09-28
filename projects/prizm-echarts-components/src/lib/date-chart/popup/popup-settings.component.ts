@@ -32,6 +32,7 @@ import { LineSeriesOption, SeriesOption } from 'echarts';
 import { BehaviorSubject } from 'rxjs';
 
 type LineType = 'solid' | 'dashed' | 'dotted';
+type SymbolType = 'circle' | 'rect' | 'roundRect' | 'triangle' | 'diamond' | 'pin' | 'arrow' | 'emptyCircle' | 'none';
 type PrizmItem<T = string> = {
   id: T;
   name: string;
@@ -78,7 +79,19 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
     { id: 'dotted', name: 'Точечная' },
   ];
 
-  readonly stringify: PrizmSelectStringify<PrizmItem<LineType> | undefined> = (
+  symbolOptions: PrizmItem<SymbolType>[] = [
+    { id: 'circle', name: 'Круг' },
+    { id: 'rect', name: 'Квадрат' },
+    { id: 'roundRect', name: 'Скругленный квадрат' },
+    { id: 'triangle', name: 'Треугольник' },
+    { id: 'diamond', name: 'Ромб' },
+    { id: 'pin', name: 'Булавка' },
+    { id: 'arrow', name: 'Стрелка' },
+    { id: 'emptyCircle', name: 'Пустой круг' },
+    { id: 'none', name: 'Нет' },
+  ];
+
+  readonly stringify: PrizmSelectStringify<PrizmItem<LineType|SymbolType> | undefined> = (
     item
   ) => String(item?.name ?? '-');
 
@@ -100,6 +113,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
           type: seriesValues[index]?.lineStyleType.id,
           width: seriesValues[index]?.lineStyleWidth || series.lineStyle?.width,
         },
+        symbol: seriesValues[index]?.symbolType.id || series.symbol,
       };
     });
     this.onChangesSubmit.emit(updatedSeries);
@@ -125,6 +139,11 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
                 )
               ),
               lineStyleWidth: this.formBuilder.control(series.lineStyle?.width),
+              symbolType: this.formBuilder.control(
+                this.symbolOptions.find(
+                  ({ id }) => id === series.symbol
+                )
+              ),
             })
           )
         );
