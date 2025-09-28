@@ -105,7 +105,6 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
     this.yAxisSettings$.next(
       Array.isArray(currentState.yAxis) ? currentState.yAxis : null
     );
-    console.log("yAxisSettings$",this.yAxisSettings$.value,currentState)
   }
 
   protected onChartInit(instance: echarts.ECharts) {
@@ -118,7 +117,7 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
   //todo: remove dynamic fields from config (data)
   private exportConfig() {
     if (!this.chartInstance) return;
-    const currentConfig = this.chartInstance.getOption();
+    const {dataset: _,currentConfig } = this.chartInstance.getOption();
 
     const configStr = JSON.stringify(currentConfig, null, 2); // null, 2 for pretty formatting
 
@@ -218,10 +217,13 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
     );
 
     // Create yAxis configurations - you can set hiddenByDefault to true to hide all yAxis by default
-    const yAxis: YAXisOption[] = createYAxisOption(
-      newInputSeries    );
+    const yAxis: YAXisOption[] = createYAxisOption(newInputSeries);
 
-    this.mergeOptions$.next({ dataset, series, yAxis:[ECHARTS_CONFIG_PRESETS.Y_AXIS_DEFAULT,...yAxis] });
+    this.mergeOptions$.next({
+      dataset,
+      series,
+      yAxis: [ECHARTS_CONFIG_PRESETS.Y_AXIS_DEFAULT, ...yAxis],
+    });
   }
   onChangesSubmit({
     series,

@@ -51,7 +51,11 @@
             "configDir": "projects/prizm-echarts-components/.storybook",
             "browserTarget": "prizm-echarts-components:build",
             "compodoc": false,
-            "outputDir": "storybook-static"
+            "outputDir": "storybook-static",
+            "styles": [
+              "node_modules/@prizm-ui/theme/src/styles/styles.less",
+              "node_modules/@prizm-ui/components/src/styles/styles.less"
+            ]
           }
         }
       }
