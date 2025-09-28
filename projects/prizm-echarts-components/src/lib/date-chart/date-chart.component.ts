@@ -99,7 +99,6 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
         ? currentState.legend.at(0)
         : currentState.legend) ?? null
     );
-    console.log("currentState.yAxis",currentState.yAxis)
     this.yAxisSettings$.next(
       Array.isArray(currentState.yAxis) ? currentState.yAxis : null
     );
@@ -107,7 +106,6 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
   }
 
   protected onChartInit(instance: echarts.ECharts) {
-    console.log('onChartInit', instance);
     this.chartInstance = instance;
     setTimeout(() => {
       this.onChangeSeries(this.series);
@@ -150,7 +148,6 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
       console.warn('Empty file');
     }
 
-    console.log('importFile', configFile);
     try {
       const config = await this.readFileAsText(configFile).then((res) =>
         JSON.parse(res)
@@ -164,6 +161,7 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
     xAxis: ECHARTS_CONFIG_PRESETS.X_AXIS,
     legend: ECHARTS_CONFIG_PRESETS.LEGEND,
     grid: ECHARTS_CONFIG_PRESETS.GRID,
+    tooltip: ECHARTS_CONFIG_PRESETS.TOOLTIP as any,
 
     toolbox: {
       feature: {
@@ -218,7 +216,6 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
     );
 
     const yAxis: YAXisOption[] = createYAxisOption(newInputSeries);
-console.log("{ dataset, series, yAxis }",{ dataset, series, yAxis })
     this.mergeOptions$.next({ dataset, series, yAxis });
   }
   onChangesSubmit({

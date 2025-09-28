@@ -96,7 +96,6 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
   @Input() set yAxisSettings(value: YAXisOption[]|null) {
     if (value) {
       this.yAxisSettings$.next(value);
-      console.log("yAxisSettings$",this.yAxisSettings$)
     }
   }
 
@@ -256,7 +255,6 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
           }),
           yAxis: yAxisGroup,
         });
-        console.log("this.formGroup = ",this.formGroup )
       });
   }
 

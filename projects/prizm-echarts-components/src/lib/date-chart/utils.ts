@@ -87,14 +87,14 @@ export function createSeriesOptions(
       return {
         ...existingSettings,
         type: existingSettings.type || 'line', // Ensure type is set
-        name: s.name, // Ensure name matches the series name
+        name: `${s.name}, ${s.unit}`,
       } as SeriesOption;
     }
 
     // Default settings for new series
     return {
       type: 'line',
-      name: s.name,
+      name: `${s.name}, ${s.unit}`,
       id: s.name,
       datasetId: s.name,
       yAxisId: s.unit,

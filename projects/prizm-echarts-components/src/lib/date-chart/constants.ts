@@ -1,4 +1,4 @@
-import { background } from "storybook/internal/theming";
+import { EChartsOption, LegendComponentOption, SeriesOption } from 'echarts';
 
 export const ECHARTS_CONFIG_PRESETS = {
   DATA_ZOOM: [
@@ -23,8 +23,8 @@ export const ECHARTS_CONFIG_PRESETS = {
     nameRotate: 90,
     nameGap: 2,
     nameTextStyle: {
-      align:'left' as const,
-      verticalAlign:'bottom' as const,
+      align: 'left' as const,
+      verticalAlign: 'bottom' as const,
     },
 
     axisLine: {
@@ -52,6 +52,48 @@ export const ECHARTS_CONFIG_PRESETS = {
     top: '10%',
     containLabel: true,
   },
+  TOOLTIP: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'cross',
+    },
+    formatter: function (params) {
+      if (Array.isArray(params)) {
+        const initValue = params.at(0);
+        const date =
+          initValue && 'axisValueLabel' in initValue
+            ? initValue.axisValueLabel
+            : 'Undefined Date';
+        let result = `<div style="margin-bottom: 4px; font-weight: bold;">${date}</div>`;
+        params.forEach((param) => {
+          const color = param.color;
+          const seriesName = param.seriesName;
+          const rawValue =
+            param.data && typeof param.data === 'object' && 'v' in param.data
+              ? param.data['v'] ?? 'Empty Value'
+              : 'Undefined Value';
+          
+          // Format the value using Intl.NumberFormat
+          const value = typeof rawValue === 'number' 
+            ? new Intl.NumberFormat('ru-RU', {
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 2
+              }).format(rawValue)
+            : rawValue;
+          
+          result += `
+            <div style="display: flex; align-items: center; margin: 2px 0;">
+              <span style="display: inline-block; width: 10px; height: 10px; background-color: ${color}; margin-right: 8px;"></span>
+              <span style="flex: 1;">${seriesName}:</span>
+              <span style="font-weight: bold; margin-left: 8px;">${value}</span>
+            </div>
+          `;
+        });
+        return result;
+      }
+      return '';
+    },
+  } satisfies EChartsOption['tooltip'],
 };
 
 export const COLOR_PALETTE = [
