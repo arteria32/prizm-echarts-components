@@ -1,3 +1,4 @@
+import { background } from "storybook/internal/theming";
 
 export const ECHARTS_CONFIG_PRESETS = {
   DATA_ZOOM: [
@@ -18,22 +19,24 @@ export const ECHARTS_CONFIG_PRESETS = {
   Y_AXIS: {
     type: 'value' as const,
     position: 'left' as const,
-    nameLocation: 'middle' as const,
-    nameGap: 5,
-    maxInterval: 10000000,
+    nameLocation: 'end' as const,
+    nameRotate: 90,
+    nameGap: 2,
+    nameTextStyle: {
+      align:'left' as const,
+      verticalAlign:'bottom' as const,
+    },
 
     axisLine: {
       show: true,
     },
     splitNumber: 1,
     boundaryGap: ['5%', '5%'] as [string, string],
-    nameTextStyle: {
-      backgroundColor: '#545f77',
-    },
+
     axisLabel: {
       rotate: 90,
       verticalAlign: 'middle' as const,
-      align: 'center' as const,
+      align: 'right' as const,
       hideOverlap: true,
     },
   },
