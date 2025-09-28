@@ -4,6 +4,7 @@
   "scripts": {
     "build": "ng build",
     "storybook": "ng run prizm-echarts-components:storybook",
+    "build-storybook": "ng run prizm-echarts-components:build-storybook",
     "dev": "npm run storybook"
   },
   "private": true,
