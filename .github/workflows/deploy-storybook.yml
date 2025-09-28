@@ -43,14 +43,28 @@ jobs:
       - name: Build Storybook
         run: npm run build-storybook
         
+      - name: Verify build output
+        run: |
+          echo "Checking for storybook-static directory..."
+          ls -la
+          if [ -d "storybook-static" ]; then
+            echo "✅ storybook-static directory found"
+            ls -la storybook-static
+          else
+            echo "❌ storybook-static directory not found"
+            echo "Available directories:"
+            find . -type d -name "*storybook*" -o -name "*static*" 2>/dev/null || echo "No storybook or static directories found"
+            exit 1
+          fi
+        
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload storybook build from project directory
-          path: './projects/prizm-echarts-components/storybook-static'
+          # Upload storybook build from root directory
+          path: './storybook-static'
 
   # Deployment job
   deploy:
