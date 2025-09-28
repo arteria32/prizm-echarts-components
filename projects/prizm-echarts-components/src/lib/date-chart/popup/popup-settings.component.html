@@ -2,16 +2,21 @@
   <div class="popup-body">
     <form [formGroup]="formGroup">
       <div formGroupName="series" class="series-container">
-        <div *ngFor="let series of seriesSettings$ | async; let i = index" class="series-item">
-          <label [for]="'series-name-' + i">Series {{ i + 1 }} Name:</label>
-          <div [formGroupName]="i" class="series-fields">
-            <input
-              type="text"
-              id="series-name-{{ i }}"
-              formControlName="name"
-              class="series-name-input"
-            />
-          </div>
+        <div
+          *ngFor="let series of seriesSettings$ | async; let i = index"
+          class="series-item"
+        >
+          <prizm-card>
+            <prizm-panel [header]="series.name?.toString() ?? '-'">
+            </prizm-panel>
+            <div class="form-content" [formGroupName]="i">
+              <prizm-input-layout label="Тип линии">
+                <prizm-input-select formControlName="lineStyleType" [stringify]="stringify" [items]="lineStyleOptions"></prizm-input-select>
+              </prizm-input-layout>
+            </div>
+          </prizm-card>
+
+          
         </div>
       </div>
     </form>
@@ -28,7 +33,12 @@
     >
       Закрыть
     </button>
-    <button (click)="completeWith(formGroup)" prizmButton appearance="primary" size="xl">
+    <button
+      (click)="completeWith(formGroup)"
+      prizmButton
+      appearance="primary"
+      size="xl"
+    >
       Сохранить
     </button>
   </div>
