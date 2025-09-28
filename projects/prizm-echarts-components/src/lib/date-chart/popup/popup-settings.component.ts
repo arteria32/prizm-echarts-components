@@ -24,12 +24,15 @@ import {
   PrizmSelectInputComponent,
   PrizmInputSelectModule,
   PrizmSelectStringify,
+  PrizmInputNumberComponent,
+  PrizmInputCommonModule,
+  PrizmInputNumberModule,
 } from '@prizm-ui/components';
 import { LineSeriesOption, SeriesOption } from 'echarts';
 import { BehaviorSubject } from 'rxjs';
 
 type LineType = 'solid' | 'dashed' | 'dotted';
-type PrizmItem<T = number> = {
+type PrizmItem<T = string> = {
   id: T;
   name: string;
 };
@@ -38,13 +41,14 @@ type PrizmItem<T = number> = {
   standalone: true,
   imports: [
     CommonModule,
-    PrizmDialogComponent,
     PrizmPanelComponent,
     PrizmCardComponent,
     PrizmButtonComponent,
     ReactiveFormsModule,
     PrizmSelectInputComponent,
     PrizmInputSelectModule,
+    PrizmInputCommonModule,
+    PrizmInputNumberModule,
   ],
   providers: [provideAnimations()],
   templateUrl: './popup-settings.component.html',
@@ -74,8 +78,9 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
     { id: 'dotted', name: 'Точечная' },
   ];
 
-  readonly stringify: PrizmSelectStringify<PrizmItem|undefined> = (item) =>
-    String(item?.name ?? '-');
+  readonly stringify: PrizmSelectStringify<PrizmItem<LineType> | undefined> = (
+    item
+  ) => String(item?.name ?? '-');
 
   onSubmit(newStateFormGroup: FormGroup): void {
     if (!newStateFormGroup.valid) {
@@ -93,6 +98,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
         lineStyle: {
           ...series.lineStyle,
           type: seriesValues[index]?.lineStyleType.id,
+          width: seriesValues[index]?.lineStyleWidth || series.lineStyle?.width,
         },
       };
     });
@@ -118,6 +124,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
                   ({ id }) => id === series.lineStyle?.type
                 )
               ),
+              lineStyleWidth: this.formBuilder.control(series.lineStyle?.width),
             })
           )
         );

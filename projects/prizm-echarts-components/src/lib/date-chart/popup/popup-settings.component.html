@@ -11,12 +11,25 @@
             </prizm-panel>
             <div class="form-content" [formGroupName]="i">
               <prizm-input-layout label="Тип линии">
-                <prizm-input-select formControlName="lineStyleType" [stringify]="stringify" [items]="lineStyleOptions"></prizm-input-select>
+                <prizm-input-select
+                  formControlName="lineStyleType"
+                  [stringify]="stringify"
+                  [items]="lineStyleOptions"
+                ></prizm-input-select>
+              </prizm-input-layout>
+              <prizm-input-layout label="Толщина линии">
+                <input
+                  prizmInput
+                  #inputNumber="prizmInputNumber"
+                  type="number"
+                  formControlName="lineStyleWidth"
+                  [min]="1"
+                  [max]="10"
+                  [step]="1"
+                />
               </prizm-input-layout>
             </div>
           </prizm-card>
-
-          
         </div>
       </div>
     </form>
