@@ -112,6 +112,11 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
           ...series.lineStyle,
           type: seriesValues[index]?.lineStyleType.id,
           width: seriesValues[index]?.lineStyleWidth || series.lineStyle?.width,
+          color: seriesValues[index]?.lineStyleColor || series.lineStyle?.color,
+        },
+        itemStyle: {
+          ...series.itemStyle,
+          color: seriesValues[index]?.lineStyleColor || series.itemStyle?.color,
         },
         symbol: seriesValues[index]?.symbolType.id || series.symbol,
       };
@@ -139,6 +144,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
                 )
               ),
               lineStyleWidth: this.formBuilder.control(series.lineStyle?.width),
+              lineStyleColor: this.formBuilder.control(series.lineStyle?.color),
               symbolType: this.formBuilder.control(
                 this.symbolOptions.find(
                   ({ id }) => id === series.symbol

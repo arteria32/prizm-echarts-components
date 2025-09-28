@@ -47,7 +47,6 @@ export function createDatasetSources(
   return series.map(({ name, points }) => ({
     id: name,
     source: points,
-   
   }));
 }
 
@@ -78,8 +77,9 @@ export function createSeriesOptions(
     return {
       type: 'line',
       name: s.name,
-      id:s.name,
+      id: s.name,
       datasetId: s.name,
+
       encode: {
         x: 'd',
         y: 'v',
@@ -87,4 +87,3 @@ export function createSeriesOptions(
     } satisfies SeriesOption;
   });
 }
-
