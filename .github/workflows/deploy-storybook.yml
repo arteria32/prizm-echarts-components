@@ -40,6 +40,22 @@ jobs:
           cd projects/prizm-echarts-components
           npm ci
               
+      - name: Check Storybook configuration
+        run: |
+          echo "Checking Storybook configuration..."
+          if [ -d "projects/prizm-echarts-components/.storybook" ]; then
+            echo "✅ .storybook directory found"
+            ls -la projects/prizm-echarts-components/.storybook
+            echo "Checking for stories..."
+            find projects/prizm-echarts-components/src -name "*.stories.*" -type f | head -10
+            echo "Total story files found:"
+            find projects/prizm-echarts-components/src -name "*.stories.*" -type f | wc -l
+          else
+            echo "❌ .storybook directory not found"
+            echo "Available directories in project:"
+            ls -la projects/prizm-echarts-components/
+          fi
+        
       - name: Build Storybook
         run: npm run build-storybook
         
@@ -49,11 +65,28 @@ jobs:
           ls -la
           if [ -d "storybook-static" ]; then
             echo "✅ storybook-static directory found"
+            echo "Directory contents:"
             ls -la storybook-static
+            echo "Checking for index.html:"
+            if [ -f "storybook-static/index.html" ]; then
+              echo "✅ index.html found"
+              echo "File size: $(wc -c < storybook-static/index.html) bytes"
+              echo "First few lines of index.html:"
+              head -10 storybook-static/index.html
+            else
+              echo "❌ index.html not found in storybook-static"
+            fi
+            echo "Checking for static assets:"
+            find storybook-static -name "*.js" -o -name "*.css" | head -10
+            echo "Total files in storybook-static:"
+            find storybook-static -type f | wc -l
           else
             echo "❌ storybook-static directory not found"
             echo "Available directories:"
             find . -type d -name "*storybook*" -o -name "*static*" 2>/dev/null || echo "No storybook or static directories found"
+            echo "Checking if build failed silently:"
+            echo "Current working directory contents:"
+            ls -la
             exit 1
           fi
         
