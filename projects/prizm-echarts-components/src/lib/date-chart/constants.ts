@@ -20,6 +20,29 @@ export const ECHARTS_CONFIG_PRESETS = {
   ],
 };
 
+export const COLOR_PALETTE = [
+  '#5470c6', // Blue
+  '#91cc75', // Green
+  '#fac858', // Yellow
+  '#ee6666', // Red
+  '#73c0de', // Light Blue
+  '#3ba272', // Dark Green
+  '#fc8452', // Orange
+  '#9a60b4', // Purple
+  '#ea7ccc', // Pink
+  '#ff9f7f', // Coral
+  '#ffdb5c', // Gold
+  '#37a2da', // Sky Blue
+  '#32c5e9', // Cyan
+  '#67e0e3', // Turquoise
+  '#9fe6b8', // Mint
+  '#ffd93d', // Bright Yellow
+  '#ff6b6b', // Bright Red
+  '#4ecdc4', // Teal
+  '#45b7d1', // Steel Blue
+  '#96ceb4', // Sage Green
+];
+
 export const ICONS_PATHS = {
   EXPORT_FILE: 'M12 16l-5-5h3V5h4v6h3l-5 5z',
   IMPORT_FILE: 'M12 8 L17 13 L14 13 L14 19 L10 19 L10 13 L7 13 L12 8 Z',

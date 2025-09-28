@@ -173,7 +173,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
         size: 'm',
         closeable: true,
         footer: this.footerTemp,
-        width: '800px',
+        width: '1000px',
         backdrop: false,
       })
       .pipe(takeUntilDestroyed(this.destroyRef$))

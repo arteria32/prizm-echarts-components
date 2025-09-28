@@ -1,6 +1,29 @@
 .popup-body {
   padding: 16px;
 }
-.form-content{
+
+.form-content {
   padding: 16px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
 }
+
+.form-content > * {
+  flex: 1;
+  min-width: 180px;
+}
+
+.color-input-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 4px;
+}
+
+.color-input-wrapper label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--prizm-text-icon-secondary);
+
+}
+

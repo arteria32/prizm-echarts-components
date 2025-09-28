@@ -10,6 +10,14 @@
             <prizm-panel [header]="series.name?.toString() ?? '-'">
             </prizm-panel>
             <div class="form-content" [formGroupName]="i">
+               <div class="color-input-wrapper">
+                 <label for="lineStyleColor">Цвет линии</label> 
+                 <input
+                   prizmInput
+                   type="color"
+                   formControlName="lineStyleColor"
+                 />
+               </div>
               <prizm-input-layout label="Тип линии">
                 <prizm-input-select
                   formControlName="lineStyleType"
@@ -28,14 +36,7 @@
                   [step]="1"
                 />
               </prizm-input-layout>
-              <div >
-                <label for="lineStyleColor">Цвет линии</label> 
-                <input
-                  prizmInput
-                  type="color"
-                  formControlName="lineStyleColor"
-                />
-              </div>
+            
               <prizm-input-layout label="Маркер">
                 <prizm-input-select
                   formControlName="symbolType"
