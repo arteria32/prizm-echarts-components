@@ -7,7 +7,9 @@ import {
   Input,
   OnChanges,
   OnInit,
+  OnDestroy,
   Output,
+  SimpleChanges,
   TemplateRef,
   ViewChild,
 } from '@angular/core';
@@ -30,7 +32,7 @@ import {
 } from '@prizm-ui/components';
 import { LegendComponentOption, LineSeriesOption } from 'echarts';
 import { YAXisOption } from 'echarts/types/dist/shared';
-import { BehaviorSubject, combineLatest, filter } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter, Observable, Subject } from 'rxjs';
 import { map, switchMap, startWith } from 'rxjs/operators';
 import {
   decodeSeriesId,
@@ -74,7 +76,7 @@ type PrizmItem<T = string> = {
   templateUrl: './popup-settings.component.html',
   styleUrl: './popup-settings.component.scss',
 })
-export class PopupSettingsComponent implements OnInit {
+export class PopupSettingsComponent implements OnInit,OnChanges {
   @ViewChild('dialogContent') dialogContent!: TemplateRef<any>;
   @ViewChild('footerTemp') footerTemp!: TemplateRef<any>;
 
@@ -96,12 +98,9 @@ export class PopupSettingsComponent implements OnInit {
       this.seriesSettings$.next(value);
     }
   }
-  isVisible$ = new BehaviorSubject<boolean>(false);
-  @Input() set isVisible(value: boolean | null) {
-    if (value) {
-      this.isVisible$.next(value);
-    }
-  }
+
+
+  @Input() isVisible: boolean | null = false;
 
   legendSettings$ = new BehaviorSubject<LegendComponentOption>({});
   @Input() set legendSettings(value: LegendComponentOption) {
@@ -117,17 +116,8 @@ export class PopupSettingsComponent implements OnInit {
     }
   }
 
-  chartSettings$ = combineLatest([
-    this.seriesSettings$,
-    this.legendSettings$,
-    this.yAxisSettings$,
-  ]).pipe(
-    map(([seriesSettings, legendSettings, yAxisSettings]) => ({
-      seriesSettings,
-      legendSettings,
-      yAxisSettings,
-    }))
-  );
+  chartSettings$ = new Subject<{seriesSettings: LineSeriesOption[], legendSettings: LegendComponentOption, yAxisSettings: YAXisOption[]}>();
+  
 
   @Output() onChangesSubmit = new EventEmitter<{
     series: LineSeriesOption[];
@@ -262,18 +252,10 @@ export class PopupSettingsComponent implements OnInit {
   }
 
   ngOnInit() {
-    // If isVisible is true when the component initializes, show the sidebar
-
-    this.isVisible$
-      .pipe(
-        filter((isVisible) => isVisible),
-        takeUntilDestroyed(this.destroyRef$)
-      )
-      .subscribe(() => this.showSidebar());
-
     this.chartSettings$
       .pipe(takeUntilDestroyed(this.destroyRef$))
       .subscribe(({ seriesSettings, legendSettings, yAxisSettings }) => {
+        console.log("seriesSettings",seriesSettings)
         // Create form controls for each series
         const seriesGroup = this.formBuilder.group(
           seriesSettings.map((series) =>
@@ -323,7 +305,22 @@ export class PopupSettingsComponent implements OnInit {
           yAxis: yAxisGroup,
           singleAxis: this.formBuilder.control(isSingleAxis),
         });
+        
       });
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    
+    if(changes['seriesSettings'].currentValue||changes['legendSettings'].currentValue||changes['yAxisSettings'].currentValue){
+      this.chartSettings$.next({
+        seriesSettings: changes['seriesSettings'].currentValue,
+        legendSettings: changes['legendSettings'].currentValue,
+        yAxisSettings: changes['yAxisSettings'].currentValue,
+      });
+      this.showSidebar();
+    }else if(changes['isVisible'] && changes['isVisible'].currentValue === true){
+      this.showSidebar();
+    }
   }
 
   showSidebar(): void {
@@ -347,7 +344,5 @@ export class PopupSettingsComponent implements OnInit {
     this.showSidebar();
   }
 
-  onClose() {
-    this.isVisible = false;
-  }
+
 }
