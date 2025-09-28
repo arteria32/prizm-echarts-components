@@ -32,9 +32,14 @@ jobs:
           node-version: '18'
           cache: 'npm'
           
-      - name: Install dependencies
+      - name: Install root dependencies
         run: npm ci
         
+      - name: Install project dependencies
+        run: |
+          cd projects/prizm-echarts-components
+          npm ci
+              
       - name: Build Storybook
         run: npm run build-storybook
         
@@ -44,8 +49,8 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          # Upload entire repository
-          path: './storybook-static'
+          # Upload storybook build from project directory
+          path: './projects/prizm-echarts-components/storybook-static'
 
   # Deployment job
   deploy:
