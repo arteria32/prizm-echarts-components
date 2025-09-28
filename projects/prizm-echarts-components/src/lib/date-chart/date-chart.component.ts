@@ -25,12 +25,16 @@ import {
   TooltipComponent,
 } from 'echarts/components';
 import { CanvasRenderer } from 'echarts/renderers';
+import { YAXisOption } from 'echarts/types/dist/shared';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { ECHARTS_CONFIG_PRESETS, ICONS_PATHS } from './constants';
 import { PopupSettingsComponent } from './popup/popup-settings.component';
-import { createDatasetSources, createSeriesOptions, createYAxisOption } from './utils';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { XAXisOption, YAXisOption } from 'echarts/types/dist/shared';
+import {
+  createDatasetSources,
+  createSeriesOptions,
+  createYAxisOption,
+} from './utils';
 
 echarts.use([
   LineChart,
@@ -70,7 +74,6 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
   @ViewChild(PopupSettingsComponent) popupComponent!: PopupSettingsComponent;
   private chartInstance: null | echarts.ECharts = null;
   protected mergeOptions$ = new Subject<EChartsOption>();
-  private cdr = inject(ChangeDetectorRef);
 
   protected isSettingsVisible$ = new BehaviorSubject(false);
 
@@ -102,7 +105,7 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
     this.yAxisSettings$.next(
       Array.isArray(currentState.yAxis) ? currentState.yAxis : null
     );
-    this.cdr.detectChanges();
+    console.log("yAxisSettings$",this.yAxisSettings$.value,currentState)
   }
 
   protected onChartInit(instance: echarts.ECharts) {
@@ -162,7 +165,6 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
     legend: ECHARTS_CONFIG_PRESETS.LEGEND,
     grid: ECHARTS_CONFIG_PRESETS.GRID,
     tooltip: ECHARTS_CONFIG_PRESETS.TOOLTIP as any,
-
     toolbox: {
       feature: {
         mySettingsPopup: {
@@ -215,8 +217,11 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
         : ([currentState.series].filter(Boolean) as SeriesOption[])
     );
 
-    const yAxis: YAXisOption[] = createYAxisOption(newInputSeries);
-    this.mergeOptions$.next({ dataset, series, yAxis });
+    // Create yAxis configurations - you can set hiddenByDefault to true to hide all yAxis by default
+    const yAxis: YAXisOption[] = createYAxisOption(
+      newInputSeries    );
+
+    this.mergeOptions$.next({ dataset, series, yAxis:[ECHARTS_CONFIG_PRESETS.Y_AXIS_DEFAULT,...yAxis] });
   }
   onChangesSubmit({
     series,

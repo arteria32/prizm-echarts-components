@@ -26,16 +26,26 @@ import {
   PrizmSelectStringify,
   PrizmTabItem,
   PrizmTabsModule,
-  PrizmToggleComponent
+  PrizmToggleComponent,
 } from '@prizm-ui/components';
 import { LegendComponentOption, LineSeriesOption } from 'echarts';
 import { YAXisOption } from 'echarts/types/dist/shared';
-import { BehaviorSubject, merge } from 'rxjs';
+import { BehaviorSubject, combineLatest } from 'rxjs';
 import { map, switchMap, startWith } from 'rxjs/operators';
-import { formatNumberToPercent, parsePercentToNumber } from '../utils';
+import { decodeSeriesId, formatNumberToPercent, parsePercentToNumber } from '../utils';
+import { ECHARTS_CONFIG_PRESETS } from '../constants';
 
 type LineType = 'solid' | 'dashed' | 'dotted';
-type SymbolType = 'circle' | 'rect' | 'roundRect' | 'triangle' | 'diamond' | 'pin' | 'arrow' | 'emptyCircle' | 'none';
+type SymbolType =
+  | 'circle'
+  | 'rect'
+  | 'roundRect'
+  | 'triangle'
+  | 'diamond'
+  | 'pin'
+  | 'arrow'
+  | 'emptyCircle'
+  | 'none';
 type PrizmItem<T = string> = {
   id: T;
   name: string;
@@ -65,7 +75,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
   @ViewChild('footerTemp') footerTemp!: TemplateRef<any>;
 
   @Input() isVisible: boolean | null = false;
-  
+
   public activeTabIndex = 0;
   public tabs: PrizmTabItem[] = [
     {
@@ -92,22 +102,22 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
     }
   }
 
-  yAxisSettings$ = new BehaviorSubject<YAXisOption[]|null>(null);
-  @Input() set yAxisSettings(value: YAXisOption[]|null) {
+  yAxisSettings$ = new BehaviorSubject<YAXisOption[] | null>(null);
+  @Input() set yAxisSettings(value: YAXisOption[] | null) {
     if (value) {
       this.yAxisSettings$.next(value);
     }
   }
 
-  chartSettings$ = merge(
+  chartSettings$ = combineLatest([
     this.seriesSettings$,
     this.legendSettings$,
-    this.yAxisSettings$
-  ).pipe(
-    map(() => ({
-      seriesSettings: this.seriesSettings$.value,
-      legendSettings: this.legendSettings$.value,
-      yAxisSettings: this.yAxisSettings$.value
+    this.yAxisSettings$,
+  ]).pipe(
+    map(([seriesSettings, legendSettings, yAxisSettings]) => ({
+      seriesSettings,
+      legendSettings,
+      yAxisSettings,
     }))
   );
 
@@ -121,6 +131,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
   private readonly dialogService = inject(PrizmDialogService);
   private readonly formBuilder = inject(FormBuilder);
   formGroup: FormGroup = this.formBuilder.group({});
+
   lineStyleOptions: PrizmItem<LineType>[] = [
     { id: 'solid', name: 'Сплошная' },
     { id: 'dashed', name: 'Пунктирная' },
@@ -139,9 +150,41 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
     { id: 'none', name: 'Нет' },
   ];
 
-  readonly stringify: PrizmSelectStringify<PrizmItem<LineType|SymbolType> | undefined> = (
-    item
-  ) => String(item?.name ?? '-');
+  axisModeOptions = [
+    {
+      title: 'Множественные оси',
+      value: true,
+      appearance: 'primary' as const,
+      appearanceType: 'ghost' as const,
+    },
+    {
+      title: 'Одна ось',
+      value: false,
+      appearance: 'secondary' as const,
+      appearanceType: 'ghost' as const,
+    },
+  ];
+
+  readonly stringify: PrizmSelectStringify<
+    PrizmItem<LineType | SymbolType> | undefined
+  > = (item) => String(item?.name ?? '-');
+
+  /**
+   * Checks if a Y-axis should be displayed based on singleAxis mode
+   * @param yAxis - The Y-axis to check
+   * @returns true if the axis should be shown, false otherwise
+   */
+  shouldShowYAxis(yAxis: YAXisOption): boolean {
+    const singleAxisValue = this.formGroup?.get('singleAxis')?.value;
+    
+    if (singleAxisValue === true) {
+      // In single axis mode, show only the default axis
+      return yAxis.id === ECHARTS_CONFIG_PRESETS.Y_AXIS_DEFAULT.id;
+    } else {
+      // In multiple axis mode, show all axes except default
+      return yAxis.id !== ECHARTS_CONFIG_PRESETS.Y_AXIS_DEFAULT.id;
+    }
+  }
 
   onSubmit(newStateFormGroup: FormGroup): void {
     if (!newStateFormGroup.valid) {
@@ -151,6 +194,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
     const seriesFormArray = newStateFormGroup.get('series');
     const legendFormGroup = newStateFormGroup.get('legend');
     const yAxisFormGroup = newStateFormGroup.get('yAxis');
+    const singleAxisValue = newStateFormGroup.get('singleAxis')?.value;
     const seriesValues = seriesFormArray?.value || [];
     const legendValues = legendFormGroup?.value || {};
     const yAxisValues = yAxisFormGroup?.value || {};
@@ -171,6 +215,9 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
           color: seriesValues[index]?.lineStyleColor || series.itemStyle?.color,
         },
         symbol: seriesValues[index]?.symbolType.id || series.symbol,
+        yAxisId: singleAxisValue
+          ? ECHARTS_CONFIG_PRESETS.Y_AXIS_DEFAULT.id
+          : decodeSeriesId(String(series.id))?.unitId,
       };
     });
 
@@ -183,13 +230,18 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
 
     // Update yAxis settings
     const currentYAxis = this.yAxisSettings$.value;
+
     const updatedYAxis = (currentYAxis || []).map((yAxis, index) => {
       const yAxisFormValues = yAxisValues[index] || {};
       return {
         ...yAxis,
+        show:
+          singleAxisValue === true
+            ? yAxis.id === ECHARTS_CONFIG_PRESETS.Y_AXIS_DEFAULT.id
+            : yAxis.id !== ECHARTS_CONFIG_PRESETS.Y_AXIS_DEFAULT.id,
         boundaryGap: [
           formatNumberToPercent(yAxisFormValues.boundaryGapStart || 5),
-          formatNumberToPercent(yAxisFormValues.boundaryGapEnd || 5)
+          formatNumberToPercent(yAxisFormValues.boundaryGapEnd || 5),
         ] as [string, string],
       } as typeof yAxis;
     });
@@ -197,7 +249,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
     this.onChangesSubmit.emit({
       series: updatedSeries,
       legend: updatedLegend,
-      yAxis: updatedYAxis
+      yAxis: updatedYAxis,
     });
   }
 
@@ -208,7 +260,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
     }
     this.chartSettings$
       .pipe(takeUntilDestroyed(this.destroyRef$))
-      .subscribe(({seriesSettings, legendSettings, yAxisSettings}) => {
+      .subscribe(({ seriesSettings, legendSettings, yAxisSettings }) => {
         // Create form controls for each series
         const seriesGroup = this.formBuilder.group(
           seriesSettings.map((series) =>
@@ -222,9 +274,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
               lineStyleWidth: this.formBuilder.control(series.lineStyle?.width),
               lineStyleColor: this.formBuilder.control(series.lineStyle?.color),
               symbolType: this.formBuilder.control(
-                this.symbolOptions.find(
-                  ({ id }) => id === series.symbol
-                )
+                this.symbolOptions.find(({ id }) => id === series.symbol)
               ),
             })
           )
@@ -235,25 +285,30 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
           (yAxisSettings || []).map((yAxis) =>
             this.formBuilder.group({
               boundaryGapStart: this.formBuilder.control(
-                Array.isArray(yAxis.boundaryGap) 
-                  ? parsePercentToNumber(String(yAxis.boundaryGap[0])) 
+                Array.isArray(yAxis.boundaryGap)
+                  ? parsePercentToNumber(String(yAxis.boundaryGap[0]))
                   : 5
               ),
               boundaryGapEnd: this.formBuilder.control(
-                Array.isArray(yAxis.boundaryGap) 
-                  ? parsePercentToNumber(String(yAxis.boundaryGap[1])) 
+                Array.isArray(yAxis.boundaryGap)
+                  ? parsePercentToNumber(String(yAxis.boundaryGap[1]))
                   : 5
               ),
             })
           )
         );
 
+        const isSingleAxis = !yAxisSettings?.some(
+          (yAxis) =>
+            yAxis.id !== ECHARTS_CONFIG_PRESETS.Y_AXIS_DEFAULT.id && yAxis.show
+        );
         this.formGroup = this.formBuilder.group({
           series: seriesGroup,
           legend: this.formBuilder.group({
             show: this.formBuilder.control(legendSettings?.show ?? true),
           }),
           yAxis: yAxisGroup,
+          singleAxis: this.formBuilder.control(isSingleAxis),
         });
       });
   }

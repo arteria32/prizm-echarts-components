@@ -95,7 +95,7 @@ export function createSeriesOptions(
     return {
       type: 'line',
       name: `${s.name}, ${s.unit}`,
-      id: s.name,
+      id: encodeSeriesId({seriesName: s.name, unitId: s.unit}),
       datasetId: s.name,
       yAxisId: s.unit,
       lineStyle: {
@@ -205,4 +205,41 @@ function blendColors(color1: string, color2: string, ratio: number): string {
   };
 
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+/**
+ * Encodes series information into a series ID string
+ * @param seriesName - The name of the series
+ * @param unitId - The unit ID associated with the series
+ * @returns Encoded series ID string in format: "seriesName|unitId"
+ */
+export function encodeSeriesId({seriesName, unitId}: {seriesName: string, unitId: string}): string {
+  return `${seriesName}|${unitId}`;
+}
+
+/**
+ * Decodes series ID string to extract series name and unit ID
+ * @param seriesId - The encoded series ID string
+ * @returns Object containing seriesName and unitId, or null if invalid format
+ */
+export function decodeSeriesId(seriesId: string): { seriesName: string; unitId: string } | null {
+  if (!seriesId || typeof seriesId !== 'string') {
+    return null;
+  }
+
+  const parts = seriesId.split('|');
+  if (parts.length !== 2) {
+    return null;
+  }
+
+  const [seriesName, unitId] = parts;
+  
+  if (!seriesName || !unitId) {
+    return null;
+  }
+
+  return {
+    seriesName: seriesName.trim(),
+    unitId: unitId.trim()
+  };
 }

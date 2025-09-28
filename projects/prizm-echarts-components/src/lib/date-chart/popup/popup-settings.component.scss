@@ -23,50 +23,82 @@ form {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: 16px;
+  gap: 20px;
+  padding: 8px 0;
 }
 
 .yaxis-item,
 .series-item {
   display: flex;
   flex-direction: row;
+  gap: 12px;
   &  > * {
     flex:1;
   }
 }
 
-.form-content {
-  padding: 16px;
+// New styles for yaxis items container
+.yaxis-items {
   display: flex;
+  flex-direction: column;
   gap: 16px;
+  padding: 8px 0;
+}
+
+.form-content {
+  padding: 20px;
+  display: flex;
+  gap: 20px;
   align-items: start;
+  flex-wrap: wrap;
 }
 
 // For legend form content - simpler layout
 .legend-form-content {
-  padding: 16px;
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+// For yaxis form content - similar to legend
+.yaxis-form-content {
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+// Control wrapper styles
+.legend-control,
+.yaxis-control {
   display: flex;
   align-items: center;
   gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--prizm-text-icon-primary);
 }
 .color-input-wrapper {
   display: flex;
   flex-direction: row;
-  gap: 4px;
-  min-width: 120px;
+  gap: 8px;
+  min-width: 140px;
+  align-items: center;
 }
 .color-input-wrapper label {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   color: var(--prizm-text-icon-secondary);
+  white-space: nowrap;
 }
 
 // Footer button styling
 .box {
   display: flex;
-  gap: 12px;
+  gap: 16px;
   justify-content: flex-end;
-  padding: 16px;
+  padding: 20px;
   border-top: 1px solid var(--prizm-border-widget);
   background: var(--prizm-background-fill-primary);
   position: sticky;
@@ -78,4 +110,3 @@ form {
   min-width: 120px;
   height: 40px;
 }
-

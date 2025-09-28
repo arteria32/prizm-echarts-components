@@ -31,7 +31,7 @@ export const ECHARTS_CONFIG_PRESETS = {
       show: true,
     },
     splitNumber: 1,
-    boundaryGap: ['50%', '50%'] as [string, string],
+    boundaryGap: ['5%', '5%'] as [string, string],
 
     axisLabel: {
       rotate: 90,
@@ -42,6 +42,13 @@ export const ECHARTS_CONFIG_PRESETS = {
     axisPointer: {
       show: false,
     },
+  },
+  Y_AXIS_DEFAULT: {
+    name: 'Default',
+    id: 'default' as const,
+    type: 'value' as const,
+    show: false,
+    boundaryGap: ['5%', '5%'] as [string, string],
   },
   Y_AXIS_BASIC_GAP: 20,
   LEGEND: {
