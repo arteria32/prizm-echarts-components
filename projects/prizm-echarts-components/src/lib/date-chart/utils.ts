@@ -124,13 +124,14 @@ export function createYAxisOption(
     const existingSettings = oldYAxisOption.find(({ id }) => id === item.unit);
     if (existingSettings) {
       newState.push(existingSettings);
+    } else {
+      newState.push({
+        ...ECHARTS_CONFIG_PRESETS.Y_AXIS,
+        id: item.unit,
+        name: item.unit,
+        offset: newState.length * ECHARTS_CONFIG_PRESETS.Y_AXIS_BASIC_GAP,
+      });
     }
-    newState.push({
-      ...ECHARTS_CONFIG_PRESETS.Y_AXIS,
-      id: item.unit,
-      name: item.unit,
-      offset: newState.length * ECHARTS_CONFIG_PRESETS.Y_AXIS_BASIC_GAP,
-    });
   }
 
   return newState;

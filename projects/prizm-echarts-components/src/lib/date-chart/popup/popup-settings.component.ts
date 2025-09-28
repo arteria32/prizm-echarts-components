@@ -30,9 +30,13 @@ import {
 } from '@prizm-ui/components';
 import { LegendComponentOption, LineSeriesOption } from 'echarts';
 import { YAXisOption } from 'echarts/types/dist/shared';
-import { BehaviorSubject, combineLatest } from 'rxjs';
+import { BehaviorSubject, combineLatest, filter } from 'rxjs';
 import { map, switchMap, startWith } from 'rxjs/operators';
-import { decodeSeriesId, formatNumberToPercent, parsePercentToNumber } from '../utils';
+import {
+  decodeSeriesId,
+  formatNumberToPercent,
+  parsePercentToNumber,
+} from '../utils';
 import { ECHARTS_CONFIG_PRESETS } from '../constants';
 
 type LineType = 'solid' | 'dashed' | 'dotted';
@@ -70,11 +74,9 @@ type PrizmItem<T = string> = {
   templateUrl: './popup-settings.component.html',
   styleUrl: './popup-settings.component.scss',
 })
-export class PopupSettingsComponent implements OnInit, OnChanges {
+export class PopupSettingsComponent implements OnInit {
   @ViewChild('dialogContent') dialogContent!: TemplateRef<any>;
   @ViewChild('footerTemp') footerTemp!: TemplateRef<any>;
-
-  @Input() isVisible: boolean | null = false;
 
   public activeTabIndex = 0;
   public tabs: PrizmTabItem[] = [
@@ -92,6 +94,12 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
   @Input() set seriesSettings(value: LineSeriesOption[] | null) {
     if (value) {
       this.seriesSettings$.next(value);
+    }
+  }
+  isVisible$ = new BehaviorSubject<boolean>(false);
+  @Input() set isVisible(value: boolean | null) {
+    if (value) {
+      this.isVisible$.next(value);
     }
   }
 
@@ -176,7 +184,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
    */
   shouldShowYAxis(yAxis: YAXisOption): boolean {
     const singleAxisValue = this.formGroup?.get('singleAxis')?.value;
-    
+
     if (singleAxisValue === true) {
       // In single axis mode, show only the default axis
       return yAxis.id === ECHARTS_CONFIG_PRESETS.Y_AXIS_DEFAULT.id;
@@ -255,9 +263,14 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
 
   ngOnInit() {
     // If isVisible is true when the component initializes, show the sidebar
-    if (this.isVisible) {
-      this.showSidebar();
-    }
+
+    this.isVisible$
+      .pipe(
+        filter((isVisible) => isVisible),
+        takeUntilDestroyed(this.destroyRef$)
+      )
+      .subscribe(() => this.showSidebar());
+
     this.chartSettings$
       .pipe(takeUntilDestroyed(this.destroyRef$))
       .subscribe(({ seriesSettings, legendSettings, yAxisSettings }) => {
@@ -311,13 +324,6 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
           singleAxis: this.formBuilder.control(isSingleAxis),
         });
       });
-  }
-
-  ngOnChanges() {
-    // If isVisible changes to true, show the sidebar
-    if (this.isVisible) {
-      this.showSidebar();
-    }
   }
 
   showSidebar(): void {
