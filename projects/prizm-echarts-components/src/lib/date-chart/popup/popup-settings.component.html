@@ -10,6 +10,38 @@
           </div>
         </prizm-card>
       </div>
+      <div formGroupName="yAxis" class="yaxis-container">
+        <div
+          *ngFor="let yAxis of yAxisSettings$ | async; let i = index"
+          class="yaxis-item"
+        >
+          <prizm-card>
+            <prizm-panel [header]="yAxis.name?.toString() ?? '-'" />
+            <div class="form-content" [formGroupName]="i">
+              <prizm-input-layout label="Нижний интервал (%)">
+                <input
+                  prizmInput
+                  #inputNumberStart="prizmInputNumber"
+                  type="number"
+                  formControlName="boundaryGapStart"
+   
+                  [step]="1"
+                />
+              </prizm-input-layout>
+              <prizm-input-layout label="Верхний интервал (%)">
+                <input
+                  prizmInput
+                  #inputNumberEnd="prizmInputNumber"
+                  type="number"
+                  formControlName="boundaryGapEnd"
+       
+                  [step]="1"
+                />
+              </prizm-input-layout>
+            </div>
+          </prizm-card>
+        </div>
+      </div>
       <div formGroupName="series" class="series-container">
         <div
           *ngFor="let series of seriesSettings$ | async; let i = index"

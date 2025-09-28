@@ -27,8 +27,10 @@ import {
   PrizmToggleComponent
 } from '@prizm-ui/components';
 import { LegendComponentOption, LineSeriesOption } from 'echarts';
-import { BehaviorSubject, combineLatest } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { YAXisOption } from 'echarts/types/dist/shared';
+import { BehaviorSubject, merge } from 'rxjs';
+import { map, switchMap, startWith } from 'rxjs/operators';
+import { formatNumberToPercent, parsePercentToNumber } from '../utils';
 
 type LineType = 'solid' | 'dashed' | 'dotted';
 type SymbolType = 'circle' | 'rect' | 'roundRect' | 'triangle' | 'diamond' | 'pin' | 'arrow' | 'emptyCircle' | 'none';
@@ -74,19 +76,29 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
     }
   }
 
-  chartSettings$ = combineLatest([
+  yAxisSettings$ = new BehaviorSubject<YAXisOption[]|null>(null);
+  @Input() set yAxisSettings(value: YAXisOption[]|null) {
+    if (value) {
+      this.yAxisSettings$.next(value);
+    }
+  }
+
+  chartSettings$ = merge(
     this.seriesSettings$,
-    this.legendSettings$
-  ]).pipe(
-    map(([seriesSettings, legendSettings]) => ({
-      seriesSettings,
-      legendSettings
+    this.legendSettings$,
+    this.yAxisSettings$
+  ).pipe(
+    map(() => ({
+      seriesSettings: this.seriesSettings$.value,
+      legendSettings: this.legendSettings$.value,
+      yAxisSettings: this.yAxisSettings$.value
     }))
   );
 
   @Output() onChangesSubmit = new EventEmitter<{
     series: LineSeriesOption[];
     legend: LegendComponentOption;
+    yAxis: YAXisOption[];
   }>();
 
   private readonly destroyRef$ = inject(DestroyRef);
@@ -122,8 +134,10 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
     }
     const seriesFormArray = newStateFormGroup.get('series');
     const legendFormGroup = newStateFormGroup.get('legend');
+    const yAxisFormGroup = newStateFormGroup.get('yAxis');
     const seriesValues = seriesFormArray?.value || [];
     const legendValues = legendFormGroup?.value || {};
+    const yAxisValues = yAxisFormGroup?.value || {};
 
     const currentSeries = this.seriesSettings$.value;
     const updatedSeries = currentSeries.map((series, index) => {
@@ -151,9 +165,23 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
       show: legendValues.show,
     };
 
+    // Update yAxis settings
+    const currentYAxis = this.yAxisSettings$.value;
+    const updatedYAxis = (currentYAxis || []).map((yAxis, index) => {
+      const yAxisFormValues = yAxisValues[index] || {};
+      return {
+        ...yAxis,
+        boundaryGap: [
+          formatNumberToPercent(yAxisFormValues.boundaryGapStart || 5),
+          formatNumberToPercent(yAxisFormValues.boundaryGapEnd || 5)
+        ] as [string, string],
+      } as typeof yAxis;
+    });
+
     this.onChangesSubmit.emit({
       series: updatedSeries,
       legend: updatedLegend,
+      yAxis: updatedYAxis
     });
   }
 
@@ -164,7 +192,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
     }
     this.chartSettings$
       .pipe(takeUntilDestroyed(this.destroyRef$))
-      .subscribe(({seriesSettings, legendSettings}) => {
+      .subscribe(({seriesSettings, legendSettings, yAxisSettings}) => {
         // Create form controls for each series
         const seriesGroup = this.formBuilder.group(
           seriesSettings.map((series) =>
@@ -186,12 +214,32 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
           )
         );
 
+        // Create form controls for each yAxis
+        const yAxisGroup = this.formBuilder.group(
+          (yAxisSettings || []).map((yAxis) =>
+            this.formBuilder.group({
+              boundaryGapStart: this.formBuilder.control(
+                Array.isArray(yAxis.boundaryGap) 
+                  ? parsePercentToNumber(String(yAxis.boundaryGap[0])) 
+                  : 5
+              ),
+              boundaryGapEnd: this.formBuilder.control(
+                Array.isArray(yAxis.boundaryGap) 
+                  ? parsePercentToNumber(String(yAxis.boundaryGap[1])) 
+                  : 5
+              ),
+            })
+          )
+        );
+
         this.formGroup = this.formBuilder.group({
           series: seriesGroup,
           legend: this.formBuilder.group({
             show: this.formBuilder.control(legendSettings?.show ?? true),
           }),
+          yAxis: yAxisGroup,
         });
+        console.log("this.formGroup = ",this.formGroup )
       });
   }
 

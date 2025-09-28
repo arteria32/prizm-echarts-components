@@ -31,7 +31,7 @@ export const ECHARTS_CONFIG_PRESETS = {
       show: true,
     },
     splitNumber: 1,
-    boundaryGap: ['5%', '5%'] as [string, string],
+    boundaryGap: ['50%', '50%'] as [string, string],
 
     axisLabel: {
       rotate: 90,

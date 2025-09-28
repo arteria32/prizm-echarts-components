@@ -78,6 +78,7 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
   protected legendSettings$ = new BehaviorSubject<LegendComponentOption | null>(
     null
   );
+  protected yAxisSettings$ = new BehaviorSubject<YAXisOption[] | null>(null);
   ngOnInit() {
     this.onChangeSeries(this.series);
   }
@@ -97,6 +98,9 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
       (Array.isArray(currentState.legend)
         ? currentState.legend.at(0)
         : currentState.legend) ?? null
+    );
+    this.yAxisSettings$.next(
+      Array.isArray(currentState.yAxis) ? currentState.yAxis : null
     );
     this.cdr.detectChanges();
   }
@@ -220,13 +224,16 @@ console.log("{ dataset, series, yAxis }",{ dataset, series, yAxis })
   onChangesSubmit({
     series,
     legend,
+    yAxis,
   }: {
     series: SeriesOption[];
     legend: LegendComponentOption;
+    yAxis: YAXisOption[];
   }) {
     this.pushOptionChanges({
       series,
       legend,
+      yAxis,
     });
   }
   private pushOptionChanges(newState: EChartsOption) {

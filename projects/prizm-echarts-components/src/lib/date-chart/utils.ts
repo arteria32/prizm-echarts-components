@@ -7,6 +7,18 @@ import {
 import { Point, PrizmEchartSeries } from './date-chart.component';
 import { COLOR_PALETTE, ECHARTS_CONFIG_PRESETS } from './constants';
 
+// Helper functions for percent format conversion
+export function parsePercentToNumber(percentValue: string): number {
+  if (typeof percentValue === 'string' && percentValue.endsWith('%')) {
+    return parseFloat(percentValue.replace('%', ''));
+  }
+  return parseFloat(percentValue) || 5;
+}
+
+export function formatNumberToPercent(numberValue: number): string {
+  return `${numberValue}%`;
+}
+
 // Mock data generator function
 export function generateMockData(
   seriesCount: number = 3,
