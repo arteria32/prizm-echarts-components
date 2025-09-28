@@ -8,6 +8,7 @@
 <prizm-popup-settings
   [isVisible]="isSettingsVisible$ | async"
   [seriesSettings]="seriesSettings$ | async"
+  [legendSettings]="legendSettings$ | async"
   (onChangesSubmit)="onChangesSubmit($event)"
 />
 <input

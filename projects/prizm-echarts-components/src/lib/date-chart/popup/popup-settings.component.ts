@@ -11,25 +11,24 @@ import {
   TemplateRef,
   ViewChild,
 } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import {
   PrizmButtonComponent,
   PrizmCardComponent,
-  PrizmDialogComponent,
   PrizmDialogService,
-  PrizmPanelComponent,
-  PrizmSelectInputComponent,
-  PrizmInputSelectModule,
-  PrizmSelectStringify,
-  PrizmInputNumberComponent,
   PrizmInputCommonModule,
   PrizmInputNumberModule,
+  PrizmInputSelectModule,
+  PrizmPanelComponent,
+  PrizmSelectInputComponent,
+  PrizmSelectStringify,
+  PrizmToggleComponent
 } from '@prizm-ui/components';
-import { LineSeriesOption, SeriesOption } from 'echarts';
-import { BehaviorSubject } from 'rxjs';
+import { LegendComponentOption, LineSeriesOption } from 'echarts';
+import { BehaviorSubject, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 type LineType = 'solid' | 'dashed' | 'dotted';
 type SymbolType = 'circle' | 'rect' | 'roundRect' | 'triangle' | 'diamond' | 'pin' | 'arrow' | 'emptyCircle' | 'none';
@@ -50,6 +49,7 @@ type PrizmItem<T = string> = {
     PrizmInputSelectModule,
     PrizmInputCommonModule,
     PrizmInputNumberModule,
+    PrizmToggleComponent,
   ],
   providers: [provideAnimations()],
   templateUrl: './popup-settings.component.html',
@@ -67,7 +67,27 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
     }
   }
 
-  @Output() onChangesSubmit = new EventEmitter<LineSeriesOption[]>();
+  legendSettings$ = new BehaviorSubject<LegendComponentOption>({});
+  @Input() set legendSettings(value: LegendComponentOption) {
+    if (value) {
+      this.legendSettings$.next(value);
+    }
+  }
+
+  chartSettings$ = combineLatest([
+    this.seriesSettings$,
+    this.legendSettings$
+  ]).pipe(
+    map(([seriesSettings, legendSettings]) => ({
+      seriesSettings,
+      legendSettings
+    }))
+  );
+
+  @Output() onChangesSubmit = new EventEmitter<{
+    series: LineSeriesOption[];
+    legend: LegendComponentOption;
+  }>();
 
   private readonly destroyRef$ = inject(DestroyRef);
   private readonly dialogService = inject(PrizmDialogService);
@@ -101,7 +121,9 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
       return;
     }
     const seriesFormArray = newStateFormGroup.get('series');
+    const legendFormGroup = newStateFormGroup.get('legend');
     const seriesValues = seriesFormArray?.value || [];
+    const legendValues = legendFormGroup?.value || {};
 
     const currentSeries = this.seriesSettings$.value;
     const updatedSeries = currentSeries.map((series, index) => {
@@ -121,7 +143,18 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
         symbol: seriesValues[index]?.symbolType.id || series.symbol,
       };
     });
-    this.onChangesSubmit.emit(updatedSeries);
+
+    // Update legend settings
+    const currentLegend = this.legendSettings$.value;
+    const updatedLegend = {
+      ...currentLegend,
+      show: legendValues.show,
+    };
+
+    this.onChangesSubmit.emit({
+      series: updatedSeries,
+      legend: updatedLegend,
+    });
   }
 
   ngOnInit() {
@@ -129,13 +162,12 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
     if (this.isVisible) {
       this.showSidebar();
     }
-    this.seriesSettings$
+    this.chartSettings$
       .pipe(takeUntilDestroyed(this.destroyRef$))
-      .subscribe((value) => {
-        console.log('VALUEE', value);
+      .subscribe(({seriesSettings, legendSettings}) => {
         // Create form controls for each series
         const seriesGroup = this.formBuilder.group(
-          value.map((series) =>
+          seriesSettings.map((series) =>
             this.formBuilder.group({
               name: this.formBuilder.control(series.name),
               lineStyleType: this.formBuilder.control(
@@ -156,6 +188,9 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
 
         this.formGroup = this.formBuilder.group({
           series: seriesGroup,
+          legend: this.formBuilder.group({
+            show: this.formBuilder.control(legendSettings?.show ?? true),
+          }),
         });
       });
   }

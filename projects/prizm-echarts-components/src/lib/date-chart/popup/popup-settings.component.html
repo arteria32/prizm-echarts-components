@@ -1,23 +1,31 @@
 <ng-template #dialogContent>
   <div class="popup-body">
     <form [formGroup]="formGroup">
+      <div formGroupName="legend" class="legend-container">
+        <prizm-card>
+          <prizm-panel header="Настройки легенды" />
+          <div class="legend-form-content">
+            Отображать
+            <prizm-toggle formControlName="show" />
+          </div>
+        </prizm-card>
+      </div>
       <div formGroupName="series" class="series-container">
         <div
           *ngFor="let series of seriesSettings$ | async; let i = index"
           class="series-item"
         >
           <prizm-card>
-            <prizm-panel [header]="series.name?.toString() ?? '-'">
-            </prizm-panel>
+            <prizm-panel [header]="series.name?.toString() ?? '-'" />
             <div class="form-content" [formGroupName]="i">
-               <div class="color-input-wrapper">
-                 <label for="lineStyleColor">Цвет линии</label> 
-                 <input
-                   prizmInput
-                   type="color"
-                   formControlName="lineStyleColor"
-                 />
-               </div>
+              <div class="color-input-wrapper">
+                <label for="lineStyleColor">Цвет линии</label>
+                <input
+                  prizmInput
+                  type="color"
+                  formControlName="lineStyleColor"
+                />
+              </div>
               <prizm-input-layout label="Тип линии">
                 <prizm-input-select
                   formControlName="lineStyleType"
@@ -36,7 +44,7 @@
                   [step]="1"
                 />
               </prizm-input-layout>
-            
+
               <prizm-input-layout label="Маркер">
                 <prizm-input-select
                   formControlName="symbolType"

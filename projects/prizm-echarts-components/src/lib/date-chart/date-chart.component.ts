@@ -13,7 +13,7 @@ import {
 import * as echarts from 'echarts/core';
 // import necessary echarts components
 import { CommonModule } from '@angular/common';
-import { EChartsOption, SeriesOption } from 'echarts';
+import { EChartsOption, LegendComponentOption, SeriesOption } from 'echarts';
 import { LineChart } from 'echarts/charts';
 import {
   DatasetComponent,
@@ -40,7 +40,7 @@ echarts.use([
   DatasetComponent,
   DataZoomInsideComponent,
   TooltipComponent,
-  LegendComponent
+  LegendComponent,
 ]);
 
 type DateString = string;
@@ -73,6 +73,9 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
   protected isSettingsVisible$ = new BehaviorSubject(false);
 
   protected seriesSettings$ = new BehaviorSubject<SeriesOption[] | null>(null);
+  protected legendSettings$ = new BehaviorSubject<LegendComponentOption | null>(
+    null
+  );
   ngOnInit() {
     this.onChangeSeries(this.series);
   }
@@ -87,6 +90,11 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
 
     this.seriesSettings$.next(
       Array.isArray(currentState.series) ? currentState.series : null
+    );
+    this.legendSettings$.next(
+      (Array.isArray(currentState.legend)
+        ? currentState.legend.at(0)
+        : currentState.legend )?? null
     );
     this.cdr.detectChanges();
   }
@@ -205,9 +213,10 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
 
     this.mergeOptions$.next({ dataset, series });
   }
-  onChangesSubmit(series: SeriesOption[]) {
+  onChangesSubmit({ series, legend }: { series: SeriesOption[]; legend: LegendComponentOption }) {
     this.pushOptionChanges({
       series,
+      legend,
     });
   }
   private pushOptionChanges(newState: EChartsOption) {
