@@ -17,14 +17,34 @@ Make sure your repository has the following settings:
 - **Actions**: Enabled
 - **Pages**: Source set to "GitHub Actions"
 
-### 3. Workflow Configuration
+### 3. Environment Protection Rules (if needed)
+
+If you encounter branch protection errors, you may need to configure environment protection rules:
+
+1. Go to **Settings** → **Environments**
+2. Click on **github-pages** environment
+3. Under **Protection rules**, you can:
+   - **Remove branch restrictions** if you want to allow all branches
+   - **Add specific branches** that are allowed to deploy
+   - **Configure required reviewers** if you want manual approval
+
+**Common configurations:**
+- **Allow all branches**: Remove all branch restrictions
+- **Allow specific branches**: Add `main` and any other branches you want to allow
+- **No restrictions**: Disable all protection rules for automatic deployment
+
+### 4. Workflow Configuration
 
 The deployment workflow (`.github/workflows/deploy-storybook.yml`) will automatically:
-- Trigger on pushes to `main` or `master` branches
+- Trigger on pushes to `main` branch
 - Build the Storybook using `npm run build-storybook`
 - Deploy the built files to GitHub Pages
 
-### 4. Manual Deployment
+**Manual Deployment:**
+- You can also trigger deployments manually from the Actions tab
+- Use the "Run workflow" button to deploy from any branch
+
+### 5. Manual Deployment
 
 If you need to manually trigger a deployment:
 
