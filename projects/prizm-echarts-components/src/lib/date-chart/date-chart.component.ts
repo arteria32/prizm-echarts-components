@@ -20,6 +20,7 @@ import {
   DataZoomInsideComponent,
   DataZoomSliderComponent,
   GridComponent,
+  LegendComponent,
   ToolboxComponent,
   TooltipComponent,
 } from 'echarts/components';
@@ -39,6 +40,7 @@ echarts.use([
   DatasetComponent,
   DataZoomInsideComponent,
   TooltipComponent,
+  LegendComponent
 ]);
 
 type DateString = string;
@@ -146,9 +148,8 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
   protected chartOption: EChartsOption = {
     yAxis: ECHARTS_CONFIG_PRESETS.Y_AXIS,
     xAxis: ECHARTS_CONFIG_PRESETS.X_AXIS,
-    legend: {
-      show: true,
-    },
+    legend: ECHARTS_CONFIG_PRESETS.LEGEND,
+    grid: ECHARTS_CONFIG_PRESETS.GRID,
 
     toolbox: {
       feature: {

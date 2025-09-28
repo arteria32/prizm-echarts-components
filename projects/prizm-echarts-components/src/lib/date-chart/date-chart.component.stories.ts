@@ -33,6 +33,6 @@ type Story = StoryObj<PrizmDateChartComponent>;
 
 export const Default: Story = {
   args: {
-    series: generateMockData(5),
+    series: generateMockData(10),
   },
 };
