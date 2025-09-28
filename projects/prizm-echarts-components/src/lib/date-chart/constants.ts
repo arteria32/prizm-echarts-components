@@ -1,3 +1,4 @@
+
 export const ECHARTS_CONFIG_PRESETS = {
   DATA_ZOOM: [
     {
@@ -14,11 +15,29 @@ export const ECHARTS_CONFIG_PRESETS = {
       type: 'time' as const,
     },
   ],
-  Y_AXIS: [
-    {
-      type: 'value' as const,
+  Y_AXIS: {
+    type: 'value' as const,
+    position: 'left' as const,
+    nameLocation: 'middle' as const,
+    nameGap: 5,
+    maxInterval: 10000000,
+
+    axisLine: {
+      show: true,
     },
-  ],
+    splitNumber: 1,
+    boundaryGap: ['5%', '5%'] as [string, string],
+    nameTextStyle: {
+      backgroundColor: '#545f77',
+    },
+    axisLabel: {
+      rotate: 90,
+      verticalAlign: 'middle' as const,
+      align: 'center' as const,
+      hideOverlap: true,
+    },
+  },
+  Y_AXIS_BASIC_GAP: 20,
   LEGEND: {
     show: true,
     type: 'scroll',

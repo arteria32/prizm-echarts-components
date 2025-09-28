@@ -28,8 +28,9 @@ import { CanvasRenderer } from 'echarts/renderers';
 import { NgxEchartsDirective, provideEchartsCore } from 'ngx-echarts';
 import { ECHARTS_CONFIG_PRESETS, ICONS_PATHS } from './constants';
 import { PopupSettingsComponent } from './popup/popup-settings.component';
-import { createDatasetSources, createSeriesOptions } from './utils';
+import { createDatasetSources, createSeriesOptions, createYAxisOption } from './utils';
 import { BehaviorSubject, Observable, Subject } from 'rxjs';
+import { XAXisOption, YAXisOption } from 'echarts/types/dist/shared';
 
 echarts.use([
   LineChart,
@@ -51,6 +52,7 @@ export type Point = {
 export type PrizmEchartSeries = {
   name: string;
   points: Point[];
+  unit: string;
 };
 
 @Component({
@@ -94,7 +96,7 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
     this.legendSettings$.next(
       (Array.isArray(currentState.legend)
         ? currentState.legend.at(0)
-        : currentState.legend )?? null
+        : currentState.legend) ?? null
     );
     this.cdr.detectChanges();
   }
@@ -211,9 +213,17 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
         : ([currentState.series].filter(Boolean) as SeriesOption[])
     );
 
-    this.mergeOptions$.next({ dataset, series });
+    const yAxis: YAXisOption[] = createYAxisOption(newInputSeries);
+console.log("{ dataset, series, yAxis }",{ dataset, series, yAxis })
+    this.mergeOptions$.next({ dataset, series, yAxis });
   }
-  onChangesSubmit({ series, legend }: { series: SeriesOption[]; legend: LegendComponentOption }) {
+  onChangesSubmit({
+    series,
+    legend,
+  }: {
+    series: SeriesOption[];
+    legend: LegendComponentOption;
+  }) {
     this.pushOptionChanges({
       series,
       legend,

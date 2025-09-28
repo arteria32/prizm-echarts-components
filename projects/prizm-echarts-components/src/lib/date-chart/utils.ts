@@ -1,7 +1,11 @@
 import { SeriesOption } from 'echarts';
-import { DatasetOption } from 'echarts/types/dist/shared';
+import {
+  DatasetOption,
+  XAXisOption,
+  YAXisOption,
+} from 'echarts/types/dist/shared';
 import { Point, PrizmEchartSeries } from './date-chart.component';
-import { COLOR_PALETTE } from './constants';
+import { COLOR_PALETTE, ECHARTS_CONFIG_PRESETS } from './constants';
 
 // Mock data generator function
 export function generateMockData(
@@ -30,6 +34,7 @@ export function generateMockData(
     const series: PrizmEchartSeries = {
       name: `Series${i + 1}`,
       points: points,
+      unit: `Unit${i % 5}`,
     };
 
     mockSeries.push(series);
@@ -80,6 +85,7 @@ export function createSeriesOptions(
       name: s.name,
       id: s.name,
       datasetId: s.name,
+      yAxisId: s.unit,
       lineStyle: {
         color: getColorByIndex(index),
       },
@@ -92,6 +98,30 @@ export function createSeriesOptions(
       },
     } satisfies SeriesOption;
   });
+}
+
+export function createYAxisOption(
+  series: PrizmEchartSeries[],
+  oldYAxisOption: YAXisOption[] = []
+): YAXisOption[] {
+  const newState: YAXisOption[] = [];
+  for (let item of series) {
+    if (newState.some(({ id }) => id === item.unit)) {
+      continue;
+    }
+    const existingSettings = oldYAxisOption.find(({ id }) => id === item.unit);
+    if (existingSettings) {
+      newState.push(existingSettings);
+    }
+    newState.push({
+      ...ECHARTS_CONFIG_PRESETS.Y_AXIS,
+      id: item.unit,
+      name: item.unit,
+      offset: newState.length * ECHARTS_CONFIG_PRESETS.Y_AXIS_BASIC_GAP,
+    });
+  }
+
+  return newState;
 }
 
 /**
