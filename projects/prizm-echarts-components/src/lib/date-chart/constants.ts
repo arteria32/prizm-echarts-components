@@ -39,6 +39,9 @@ export const ECHARTS_CONFIG_PRESETS = {
       align: 'right' as const,
       hideOverlap: true,
     },
+    axisPointer: {
+      show: false,
+    },
   },
   Y_AXIS_BASIC_GAP: 20,
   LEGEND: {
@@ -72,15 +75,16 @@ export const ECHARTS_CONFIG_PRESETS = {
             param.data && typeof param.data === 'object' && 'v' in param.data
               ? param.data['v'] ?? 'Empty Value'
               : 'Undefined Value';
-          
+
           // Format the value using Intl.NumberFormat
-          const value = typeof rawValue === 'number' 
-            ? new Intl.NumberFormat('ru-RU', {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 2
-              }).format(rawValue)
-            : rawValue;
-          
+          const value =
+            typeof rawValue === 'number'
+              ? new Intl.NumberFormat('ru-RU', {
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 2,
+                }).format(rawValue)
+              : rawValue;
+
           result += `
             <div style="display: flex; align-items: center; margin: 2px 0;">
               <span style="display: inline-block; width: 10px; height: 10px; background-color: ${color}; margin-right: 8px;"></span>
