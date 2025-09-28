@@ -99,6 +99,7 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
         ? currentState.legend.at(0)
         : currentState.legend) ?? null
     );
+    console.log("currentState.yAxis",currentState.yAxis)
     this.yAxisSettings$.next(
       Array.isArray(currentState.yAxis) ? currentState.yAxis : null
     );
@@ -160,7 +161,6 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
     }
   }
   protected chartOption: EChartsOption = {
-    yAxis: ECHARTS_CONFIG_PRESETS.Y_AXIS,
     xAxis: ECHARTS_CONFIG_PRESETS.X_AXIS,
     legend: ECHARTS_CONFIG_PRESETS.LEGEND,
     grid: ECHARTS_CONFIG_PRESETS.GRID,

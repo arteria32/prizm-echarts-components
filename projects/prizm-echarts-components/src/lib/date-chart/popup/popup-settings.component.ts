@@ -24,6 +24,8 @@ import {
   PrizmPanelComponent,
   PrizmSelectInputComponent,
   PrizmSelectStringify,
+  PrizmTabItem,
+  PrizmTabsModule,
   PrizmToggleComponent
 } from '@prizm-ui/components';
 import { LegendComponentOption, LineSeriesOption } from 'echarts';
@@ -52,6 +54,7 @@ type PrizmItem<T = string> = {
     PrizmInputCommonModule,
     PrizmInputNumberModule,
     PrizmToggleComponent,
+    PrizmTabsModule,
   ],
   providers: [provideAnimations()],
   templateUrl: './popup-settings.component.html',
@@ -62,6 +65,19 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
   @ViewChild('footerTemp') footerTemp!: TemplateRef<any>;
 
   @Input() isVisible: boolean | null = false;
+  
+  public activeTabIndex = 0;
+  public tabs: PrizmTabItem[] = [
+    {
+      title: 'Серии',
+    },
+    {
+      title: 'Оси Y',
+    },
+    {
+      title: 'Легенда',
+    },
+  ];
   seriesSettings$ = new BehaviorSubject<LineSeriesOption[]>([]);
   @Input() set seriesSettings(value: LineSeriesOption[] | null) {
     if (value) {
@@ -80,6 +96,7 @@ export class PopupSettingsComponent implements OnInit, OnChanges {
   @Input() set yAxisSettings(value: YAXisOption[]|null) {
     if (value) {
       this.yAxisSettings$.next(value);
+      console.log("yAxisSettings$",this.yAxisSettings$)
     }
   }
 

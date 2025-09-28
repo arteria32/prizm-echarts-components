@@ -1,33 +1,81 @@
 .popup-body {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.container {
+  padding: 16px 16px 0 16px;
+  border-bottom: 1px solid var(--prizm-border-widget);
+}
+
+form {
+  flex: 1;
   padding: 16px;
+  overflow-y: auto;
+}
+
+// Tab content containers
+.legend-container,
+.yaxis-container,
+.series-container {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+}
+
+.yaxis-item,
+.series-item {
+  display: flex;
+  flex-direction: row;
+  &  > * {
+    flex:1;
+  }
 }
 
 .form-content {
   padding: 16px;
   display: flex;
   gap: 16px;
-  flex-wrap: wrap;
+  align-items: start;
 }
 
-.form-content > * {
-  flex: 1;
-  min-width: 180px;
+// For legend form content - simpler layout
+.legend-form-content {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-
 .color-input-wrapper {
   display: flex;
   flex-direction: row;
   gap: 4px;
+  min-width: 120px;
 }
-
 .color-input-wrapper label {
   font-size: 12px;
   font-weight: 600;
   color: var(--prizm-text-icon-secondary);
 }
 
-.legend-form-content {
-  padding: 16px;
+// Footer button styling
+.box {
   display: flex;
-  gap: 4px;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 16px;
+  border-top: 1px solid var(--prizm-border-widget);
+  background: var(--prizm-background-fill-primary);
+  position: sticky;
+  bottom: 0;
+  z-index: 10;
 }
+
+.box button {
+  min-width: 120px;
+  height: 40px;
+}
+
