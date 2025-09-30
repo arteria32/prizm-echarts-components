@@ -159,6 +159,7 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
       console.warn('invalid file', error);
     }
   }
+
   protected chartOption: EChartsOption = {
     xAxis: ECHARTS_CONFIG_PRESETS.X_AXIS,
     legend: ECHARTS_CONFIG_PRESETS.LEGEND,
@@ -168,21 +169,30 @@ export class PrizmDateChartComponent implements OnChanges, OnInit {
       feature: {
         mySettingsPopup: {
           icon: ICONS_PATHS.SETTINGS,
-          title: 'Settings',
+          title: 'Настройки',
           onclick: () => {
             this.showPopup();
           },
         },
+        dataZoom: {
+          title: {
+            zoom: 'Масштабирование области',
+            back: 'Сброс масштаба области'
+          }
+        },
+        restore: {
+          title: 'Сброс'
+        },
         myExportConfig: {
           icon: ICONS_PATHS.EXPORT_FILE,
-          title: 'Export Chart Settings',
+          title: 'Экспорт настроек графика',
           onclick: () => {
             this.exportConfig();
           },
         },
         myImportConfig: {
           icon: ICONS_PATHS.IMPORT_FILE,
-          title: 'Import Chart Settings',
+          title: 'Импорт настроек графика',
           onclick: () => {
             this.fileInputRef.nativeElement.click();
           },
